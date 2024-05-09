@@ -4,6 +4,10 @@ require_relative "../../lib/decoding/decoders"
 
 module Decoding
   RSpec.describe Decoders do
+    it "uses the decode function to decode a value using the given decoder" do
+      expect(Decoders.decode(Decoders.string, "foo")).to eql(Result.ok("foo"))
+    end
+
     it "matches string" do
       expect(Decoders.string.call("foo")).to eql(Result.ok("foo"))
       expect(Decoders.string.call(123)).to eql(Result.err("expected value matching String, got: 123"))
@@ -47,6 +51,37 @@ module Decoding
 
     it "fails with a static value" do
       expect(Decoders.fail(456).call(123)).to eql(Result.err(456))
+    end
+
+    it "transforms a successfully decoded value with a block" do
+      expect(Decoders.map(Decoders.string, &:upcase).call("foo")).to eql(Result.ok("FOO"))
+      expect(Decoders.map(Decoders.string, &:upcase).call(123)).to be_err
+    end
+
+    it "decoders a value using the first matching of many decoders" do
+      expect(Decoders.any(Decoders.string, Decoders.integer).call(123)).to eql(Result.ok(123))
+    end
+
+    it "decodes any boolean value" do
+      expect(Decoders.boolean.call(true)).to eql(Result.ok(true))
+      expect(Decoders.boolean.call(false)).to eql(Result.ok(false))
+    end
+
+    it "decodes a value that may or may not be nil" do
+      expect(Decoders.optional(Decoders.string).call("foo")).to eql(Result.ok("foo"))
+      expect(Decoders.optional(Decoders.string).call(nil)).to eql(Result.ok(nil))
+    end
+
+    it "decodes a field from a hash" do
+      expect(Decoders.field("id", Decoders.integer).call("id" => 123)).to eql(Result.ok(123))
+    end
+
+    it "decodes an array of values using a decoder" do
+      expect(Decoders.array(Decoders.integer).call([1, 2, 3])).to eql(Result.ok([1, 2, 3]))
+    end
+
+    it "decodes an array element by index using a decoder" do
+      expect(Decoders.index(0, Decoders.integer).call([1, 2, 3])).to eql(Result.ok(1))
     end
   end
 end

@@ -56,5 +56,18 @@ module Decoding
     it "returns the same value when mapping err on an ok value" do
       expect(Result.ok(123).map_err { _1 * 2 }).to eql(Result.ok(123))
     end
+
+    it "combines two ok values with a block or returns the first error" do
+      expect(Result.ok(2).and(Result.ok(3)) { _1 + _2 }).to eql(Result.ok(5))
+      expect(Result.ok(2).and(Result.err("error")) { _1 + _2 }).to eql(Result.err("error"))
+      expect(Result.err("error").and(Result.ok(3)) { _1 + _2 }).to eql(Result.err("error"))
+      expect(Result.err("error 1").and(Result.err("error 2")) { _1 + _2 }).to eql(Result.err("error 1"))
+    end
+
+    it "collapses an array of result values into a single result value if all are ok" do
+      expect(Result.all([Result.ok(1), Result.ok(2)])).to eql(Result.ok([1, 2]))
+      expect(Result.all([Result.ok(1), Result.err("error")])).to eql(Result.err("error"))
+      expect(Result.all([])).to eql(Result.ok([]))
+    end
   end
 end

@@ -1,18 +1,19 @@
 # frozen_string_literal: true
 
 require_relative "../result"
+require_relative "../decoder"
 
 module Decoding
   module Decoders
     # Decoder that matches values using the `===` operator. This will work with
     # regular expressions or classes.
-    class Match
+    class Match < Decoder
       # @param pattern [#===]
       def initialize(pattern)
         @pattern = pattern
+        super()
       end
 
-      # @param value [Object]
       def call(value)
         if @pattern === value
           Result.ok(value)
