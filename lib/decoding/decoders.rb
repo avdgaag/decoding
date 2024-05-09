@@ -4,6 +4,7 @@ require_relative "decoders/match"
 require_relative "decoders/map"
 require_relative "decoders/any"
 require_relative "decoders/field"
+require_relative "decoders/array"
 require_relative "decoders/index"
 require_relative "result"
 
