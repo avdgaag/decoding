@@ -89,5 +89,9 @@ module Decoding
     it "decodes a hash using two decoders" do
       expect(decode(hash(string, integer), { "john" => 1 })).to eql(Result.ok("john" => 1))
     end
+
+    it "decodes a string to a symbol" do
+      expect(decode(symbol, "foo")).to eql(Result.ok(:foo))
+    end
   end
 end

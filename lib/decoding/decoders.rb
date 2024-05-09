@@ -160,5 +160,12 @@ module Decoding
     # @param value_decoder [Decoding::Decoder<b>]
     # @return [Decoding::Decoder<Hash<a, b>>]
     def hash(...) = Decoders::Hash.new(...)
+
+    # Decode a String value into a symbol.
+    #
+    # @example
+    #   decode(symbol, "foo") # => Decoding::Ok(:foo)
+    # @return [Decoding::Decoder<Symbol>]
+    def symbol = map(string, &:to_sym)
   end
 end
