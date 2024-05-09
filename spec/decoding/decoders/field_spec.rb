@@ -14,7 +14,7 @@ module Decoding
 
       it "fails when given a hash with the given key but non-matching value" do
         field = Field.new("name", Decoders.string)
-        expect(field.call({ "name" => nil })).to eql(Result.err("expected value matching String, got: nil"))
+        expect(field.call({ "name" => nil })).to eql(Result.err("expected String, got NilClass"))
       end
 
       it "fails when given a hash without the given key" do

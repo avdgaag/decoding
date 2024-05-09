@@ -12,39 +12,39 @@ module Decoding
 
     it "matches string" do
       expect(decode(string, "foo")).to eql(Result.ok("foo"))
-      expect(decode(string, 123)).to eql(Result.err("expected value matching String, got: 123"))
+      expect(decode(string, 123)).to eql(Result.err("expected String, got Integer"))
     end
 
     it "matches integer" do
       expect(decode(integer, 123)).to eql(Result.ok(123))
-      expect(decode(integer, 0.5)).to eql(Result.err("expected value matching Integer, got: 0.5"))
-      expect(decode(integer, nil)).to eql(Result.err("expected value matching Integer, got: nil"))
+      expect(decode(integer, 0.5)).to eql(Result.err("expected Integer, got Float"))
+      expect(decode(integer, nil)).to eql(Result.err("expected Integer, got NilClass"))
     end
 
     it "matches float" do
       expect(decode(float, 123.0)).to eql(Result.ok(123.0))
-      expect(decode(float, 123)).to eql(Result.err("expected value matching Float, got: 123"))
+      expect(decode(float, 123)).to eql(Result.err("expected Float, got Integer"))
     end
 
     it "matches numeric" do
       expect(decode(numeric, 123.0)).to eql(Result.ok(123.0))
       expect(decode(numeric, 123)).to eql(Result.ok(123))
-      expect(decode(numeric, nil)).to eql(Result.err("expected value matching Numeric, got: nil"))
+      expect(decode(numeric, nil)).to eql(Result.err("expected Numeric, got NilClass"))
     end
 
     it "matches nil" do
       expect(decode(self.nil, nil)).to eql(Result.ok(nil))
-      expect(decode(self.nil, 123)).to eql(Result.err("expected value matching NilClass, got: 123"))
+      expect(decode(self.nil, 123)).to eql(Result.err("expected NilClass, got Integer"))
     end
 
     it "matches true" do
       expect(decode(self.true, true)).to eql(Result.ok(true))
-      expect(decode(self.true, false)).to eql(Result.err("expected value matching TrueClass, got: false"))
+      expect(decode(self.true, false)).to eql(Result.err("expected TrueClass, got FalseClass"))
     end
 
     it "matches false" do
       expect(decode(self.false, false)).to eql(Result.ok(false))
-      expect(decode(self.false, true)).to eql(Result.err("expected value matching FalseClass, got: true"))
+      expect(decode(self.false, true)).to eql(Result.err("expected FalseClass, got TrueClass"))
     end
 
     it "succeeds with a static value" do

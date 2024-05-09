@@ -14,7 +14,7 @@ module Decoding
 
       it "fails when some items can not be decoded with the decoder" do
         index = Index.new(0, Decoders.integer)
-        expect(index.call(["foo"])).to eql(Result.err("error decoding array item 0: expected value matching Integer, got: \"foo\""))
+        expect(index.call(["foo"])).to eql(Result.err("error decoding array item 0: expected Integer, got String"))
       end
 
       it "fails when the given index does not exist in the array" do
