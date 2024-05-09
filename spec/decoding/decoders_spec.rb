@@ -85,5 +85,9 @@ module Decoding
     it "decodes an array element by index using a decoder" do
       expect(decode(index(0, integer), [1, 2, 3])).to eql(Result.ok(1))
     end
+
+    it "decodes a hash using two decoders" do
+      expect(decode(hash(string, integer), { "john" => 1 })).to eql(Result.ok("john" => 1))
+    end
   end
 end

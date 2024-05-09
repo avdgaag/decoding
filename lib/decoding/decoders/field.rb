@@ -16,7 +16,7 @@ module Decoding
       end
 
       def call(value)
-        if value.is_a?(Hash)
+        if value.is_a?(::Hash)
           if value.key?(@key)
             @decoder.call(value.fetch(@key))
           else

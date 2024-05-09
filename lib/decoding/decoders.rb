@@ -6,6 +6,7 @@ require_relative "decoders/any"
 require_relative "decoders/field"
 require_relative "decoders/array"
 require_relative "decoders/index"
+require_relative "decoders/hash"
 require_relative "result"
 
 module Decoding
@@ -148,5 +149,16 @@ module Decoding
     # @param decoder [Decoding::Decoder<a>]
     # @return [Decoding::Decoder<a>]
     def index(...) = Decoders::Index.new(...)
+
+    # Decode a Hash with arbitrary contents using two decoders for the keys and
+    # the pairs.
+    #
+    # @example
+    #   decode(hash(string, integer), { 'john' => 1 })
+    #   # => Decoding::Ok({ 'john' => 1 })
+    # @param key_decoder [Decoding::Decoder<a>]
+    # @param value_decoder [Decoding::Decoder<b>]
+    # @return [Decoding::Decoder<Hash<a, b>>]
+    def hash(...) = Decoders::Hash.new(...)
   end
 end
