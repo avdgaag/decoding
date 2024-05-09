@@ -69,5 +69,11 @@ module Decoding
       expect(Result.all([Result.ok(1), Result.err("error")])).to eql(Result.err("error"))
       expect(Result.all([])).to eql(Result.ok([]))
     end
+
+    it "transforms a value using a block producing a result" do
+      expect(Result.ok(5).and_then { Result.ok(_1 * 2) }).to eql(Result.ok(10))
+      expect(Result.ok(5).and_then { Result.err("error") }).to eql(Result.err("error"))
+      expect(Result.err("error").and_then { Result.ok(_1 * 2) }).to eql(Result.err("error"))
+    end
   end
 end

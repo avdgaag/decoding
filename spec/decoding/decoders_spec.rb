@@ -93,5 +93,17 @@ module Decoding
     it "decodes a string to a symbol" do
       expect(decode(symbol, "foo")).to eql(Result.ok(:foo))
     end
+
+    it "decodes in two steps" do
+      decoder = and_then(field("version", integer)) do |version|
+        if version == 1
+          field("name", string)
+        else
+          field("fullName", string)
+        end
+      end
+      expect(decode(decoder,  "version" => 1, "name" => "john")).to eql(Result.ok("john"))
+      expect(decode(decoder,  "version" => 2, "fullName" => "john")).to eql(Result.ok("john"))
+    end
   end
 end

@@ -95,6 +95,15 @@ module Decoding
     # @yieldreturn [c]
     # @return [Decoding::Result<c>]
     def and(_) = self
+
+    # Transform a result using a block that will also return a result.
+    #
+    # @yieldparam value [Object]
+    # @yieldreturn [Decoding::Result<a>]
+    # @return [Decoding::Result<a>]
+    def and_then = self
+
+    def to_result = self
   end
 
   # The `Ok` value represents the result of a successful computation.
@@ -110,6 +119,8 @@ module Decoding
 
       self.class.new(yield value, other.value)
     end
+
+    def and_then = yield(value).to_result
   end
 
   # The `Err` value represents the result of an unsuccessful computation.

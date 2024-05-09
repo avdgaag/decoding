@@ -7,6 +7,7 @@ require_relative "decoders/field"
 require_relative "decoders/array"
 require_relative "decoders/index"
 require_relative "decoders/hash"
+require_relative "decoders/and_then"
 require_relative "result"
 
 module Decoding
@@ -167,5 +168,25 @@ module Decoding
     #   decode(symbol, "foo") # => Decoding::Ok(:foo)
     # @return [Decoding::Decoder<Symbol>]
     def symbol = map(string, &:to_sym)
+
+    # Create a decoder that depends on a previously decoded value.
+    #
+    # @example
+    #   decoder = and_then(field("version", integer)) do |version|
+    #     if version == 1
+    #       field("name", string)
+    #     else
+    #       field("fullName", string)
+    #     end
+    #   end
+    #   decode(decoder, { "version" => 1, "name" => "john" })
+    #   # => Decoding::Ok("john")
+    #   decode(decoder, { "version" => 2, "fullName" => "john" })
+    #   # => Decoding::Ok("john")
+    # @param decoder [Decoding::Decoder<a>]
+    # @yieldparam value [a]
+    # @yieldreturn [Decoding::Decoder<b>]
+    # @return [Decoding::Decoder<b>]
+    def and_then(...) = Decoding::AndThen.new(...)
   end
 end
