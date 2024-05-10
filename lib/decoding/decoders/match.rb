@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "../result"
 require_relative "../decoder"
 
 module Decoding
@@ -16,11 +15,11 @@ module Decoding
 
       def call(value)
         if @pattern === value
-          Result.ok(value)
+          ok(value)
         elsif @pattern.is_a?(Class)
-          Result.err("expected #{@pattern}, got #{value.class}")
+          err("expected #{@pattern}, got #{value.class}")
         else
-          Result.err("expected value matching #{@pattern.inspect}, got: #{value.inspect}")
+          err("expected value matching #{@pattern.inspect}, got: #{value.inspect}")
         end
       end
     end

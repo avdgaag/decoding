@@ -17,9 +17,9 @@ module Decoding
           value
             .each_with_index
             .map { |v, i| @decoder.call(v).map_err { |e| "error decoding array item #{i}: #{e}" } }
-            .then { Result.all _1 }
+            .then { all _1 }
         else
-          Result.err("expected an Array, got: #{value.class}")
+          err("expected an Array, got: #{value.class}")
         end
       end
     end

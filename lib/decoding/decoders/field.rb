@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "../result"
 require_relative "../decoder"
 
 module Decoding
@@ -20,10 +19,10 @@ module Decoding
           if value.key?(@key)
             @decoder.call(value.fetch(@key))
           else
-            Result.err("expected a Hash with key #{@key}")
+            err("expected a Hash with key #{@key}")
           end
         else
-          Result.err("expected a Hash, got: #{value.inspect}")
+          err("expected a Hash, got: #{value.inspect}")
         end
       end
     end

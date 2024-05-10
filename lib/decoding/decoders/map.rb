@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "../result"
 require_relative "../decoder"
 
 module Decoding

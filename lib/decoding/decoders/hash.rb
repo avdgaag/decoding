@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "../result"
 require_relative "../decoder"
 
 module Decoding
@@ -18,7 +17,7 @@ module Decoding
       def call(value)
         if value.is_a?(::Hash)
           key_value_pairs = value.map do |k, v|
-            Result.all(
+            all(
               [
                 @key_decoder
                   .call(k)
@@ -30,9 +29,9 @@ module Decoding
               ]
             )
           end
-          Result.all(key_value_pairs).map(&:to_h)
+          all(key_value_pairs).map(&:to_h)
         else
-          Result.err("expected Hash, got #{value.class}")
+          err("expected Hash, got #{value.class}")
         end
       end
     end

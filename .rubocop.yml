@@ -17,6 +17,9 @@ Metrics/BlockLength:
   Exclude:
     - spec/**/*_spec.rb
 
+Metrics/MethodLength:
+  Max: 17
+
 Style/SignalException:
   Enabled: false
 
