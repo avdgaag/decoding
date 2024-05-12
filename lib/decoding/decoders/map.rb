@@ -9,9 +9,9 @@ module Decoding
     class Map < Decoder
       # @param decoder [Decoding::Decoder<a>]
       # @yieldparam value [a]
-      # @yieldreturn result [b]
-      def initialize(decoder, &block)
-        @decoder = decoder.to_decoder
+      # @yieldreturn [b]
+      def initialize(decoder, *rest, &block)
+        @decoders = [decoder, *rest].map(&:to_decoder)
         @block = block
         super()
       end
@@ -19,7 +19,9 @@ module Decoding
       # @param value [Object]
       # @return [Decoding::Result<b>]
       def call(value)
-        @decoder.call(value).map(&@block)
+        Result
+          .all(@decoders.map { _1.call(value) })
+          .map { @block.call(*_1) }
       end
     end
   end

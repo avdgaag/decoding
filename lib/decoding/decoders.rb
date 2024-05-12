@@ -90,8 +90,20 @@ module Decoding
     # Decode a value with the given decoder and, if successful, apply a block to
     # the decoded result.
     #
-    # @example
+    # Given multiple decoders, apply them all to the same value and, if all
+    # succeeded, create a single output value from them.
+    #
+    # @example map over a single value
     #   decode(map(string, &:upcase), "foo") # => Decoding::Ok("FOO")
+    # @example map over multiple values
+    #   decode(
+    #     map(
+    #       field("id", integer),
+    #       field("name", string)
+    #     ) { |id, name| [id, name] },
+    #     { "id" => 1, "name" => "john" }
+    #   )
+    #   # => [1, "john"]
     # @param decoder [Decoding::Decoder<a>]
     # @yieldparam value [a]
     # @yieldreturn value [b]
