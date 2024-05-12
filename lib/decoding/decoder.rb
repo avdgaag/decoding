@@ -16,5 +16,8 @@ module Decoding
     # @param value [Object]
     # @return [Decoding::Result<Object>]
     def call(value); end
+
+    # @return [Decoding::Decoder]
+    def to_decoder = self
   end
 end

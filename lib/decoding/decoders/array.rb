@@ -8,7 +8,7 @@ module Decoding
     # Decode an array where all values match a given decoder.
     class Array < Decoder
       def initialize(decoder)
-        @decoder = decoder
+        @decoder = decoder.to_decoder
         super()
       end
 

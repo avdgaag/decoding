@@ -10,8 +10,8 @@ module Decoding
       Err = Result.err("error decoding array: index is out of bounds")
 
       def initialize(index, decoder)
-        @index = index
-        @decoder = decoder
+        @index = index.to_int
+        @decoder = decoder.to_decoder
         super()
       end
 

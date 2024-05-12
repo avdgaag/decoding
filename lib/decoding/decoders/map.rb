@@ -11,7 +11,7 @@ module Decoding
       # @yieldparam value [a]
       # @yieldreturn result [b]
       def initialize(decoder, &block)
-        @decoder = decoder
+        @decoder = decoder.to_decoder
         @block = block
         super()
       end

@@ -10,7 +10,7 @@ module Decoding
     # @yieldreturn [Decoding::Decoder<b>]
     # @return [Decoding::Decoder<b>]
     def initialize(decoder, &block)
-      @decoder = decoder
+      @decoder = decoder.to_decoder
       @block = block
       super()
     end

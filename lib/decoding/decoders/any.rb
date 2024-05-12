@@ -12,7 +12,7 @@ module Decoding
 
       # @param decoders [Decoding::Decoder<a>]
       def initialize(decoder, *decoders)
-        @decoders = [decoder, *decoders]
+        @decoders = [decoder, *decoders].map(&:to_decoder)
         super()
       end
 

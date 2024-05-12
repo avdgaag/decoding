@@ -27,7 +27,7 @@ module Decoding
     # @return [Result<a>]
     def self.all(results)
       results.reduce(ok([])) do |acc, el|
-        acc.and(el) { [*_1, _2] }
+        acc.and(el.to_result) { [*_1, _2] }
       end
     end
 
