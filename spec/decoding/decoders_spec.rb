@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
+require_relative "../../lib/decoding"
 require_relative "../../lib/decoding/decoders"
 
 module Decoding
   RSpec.describe Decoders do
+    include Decoding
     include Decoders
 
     it "uses the decode function to decode a value using the given decoder" do

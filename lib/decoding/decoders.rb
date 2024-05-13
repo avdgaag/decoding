@@ -16,13 +16,6 @@ module Decoding
   module Decoders
     module_function
 
-    # Run a given `decoder` on the given input `value`.
-    #
-    # @param decoder [Decoding::Decoder<a>]
-    # @param value [Object]
-    # @return [Decoding::Result<a>]
-    def decode(decoder, value) = decoder.call(value)
-
     # Decode any string value.
     #
     # @example
