@@ -7,8 +7,7 @@ module Decoding
   # A decoder is a callable object that reads any input value and returns an
   # optionally transformed value.
   #
-  # Note: this is an abstract class; use any of its subclasses instead of this
-  # class directly.
+  # @abstract
   class Decoder
     extend Forwardable
     def_delegators "Decoding::Result", :all, :ok, :err
@@ -17,7 +16,7 @@ module Decoding
     # @return [Decoding::Result<Object>]
     def call(value); end
 
-    # @return [Decoding::Decoder]
+    # @return [Decoding::Decoder<a>]
     def to_decoder = self
   end
 end

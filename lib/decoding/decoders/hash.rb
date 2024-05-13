@@ -5,15 +5,19 @@ require_relative "../decoder"
 module Decoding
   module Decoders
     # Decode an arbitrary hash using decoders for keys and values.
+    #
+    # @see Decoding::Decoders.hash
     class Hash < Decoder
-      # @param key_decoder [Decoding::Decoder]
-      # @param value_decoder [Decoding::Decoder]
+      # @param key_decoder [Decoding::Decoder<a>]
+      # @param value_decoder [Decoding::Decoder<b>]
       def initialize(key_decoder, value_decoder)
         @key_decoder = key_decoder.to_decoder
         @value_decoder = value_decoder.to_decoder
         super()
       end
 
+      # @param value [Object]
+      # @return [Decoding::Result<Hash<a, b>>]
       def call(value)
         if value.is_a?(::Hash)
           key_value_pairs = value.map do |k, v|

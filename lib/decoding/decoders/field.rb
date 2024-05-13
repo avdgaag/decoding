@@ -5,6 +5,8 @@ require_relative "../decoder"
 module Decoding
   module Decoders
     # Decode a value from key in a given hash.
+    #
+    # @see Decoding::Decoders.field
     class Field < Decoder
       # @param key [Object]
       # @param decoder [Decoding::Decoder<a>]
@@ -14,6 +16,8 @@ module Decoding
         super()
       end
 
+      # @param value [Object]
+      # @return [Deceoding::Result<a>]
       def call(value)
         if value.is_a?(::Hash)
           if value.key?(@key)

@@ -16,11 +16,14 @@ module Decoding
   module Decoders
     module_function
 
+    # @!group Simple decoders
+
     # Decode any string value.
     #
     # @example
     #   decode(string, "foo") # => Decoding::Ok("foo")
     # @return [Decoding::Decoder<String>]
+    # @see Decoding::Decoders::Match
     def string = Decoders::Match.new(String)
 
     # Decode any integer value.
@@ -28,6 +31,7 @@ module Decoding
     # @example
     #   decode(integer, 1) # => Decoding::Ok(1)
     # @return [Decoding::Decoder<Integer>]
+    # @see Decoding::Decoders::Match
     def integer = Decoders::Match.new(Integer)
 
     # Decode any float value.
@@ -35,6 +39,7 @@ module Decoding
     # @example
     #   decode(float, 0.5) # => Decoding::Ok(0.5)
     # @return [Decoding::Decoder<Float>]
+    # @see Decoding::Decoders::Match
     def float = Decoders::Match.new(Float)
 
     # Decode any numeric value (includes both integers and floats).
@@ -43,6 +48,7 @@ module Decoding
     #   decode(numeric, 1) # => Decoding::Ok(1)
     #   decode(numeric, 1.5) # => Decoding::Ok(1.5)
     # @return [Decoding::Decoder<Numeric>]
+    # @see Decoding::Decoders::Match
     def numeric = Decoders::Match.new(Numeric)
 
     # Decode a `nil` value.
@@ -50,6 +56,7 @@ module Decoding
     # @example
     #   decode(Decoders.nil, nil) # => Decoding::Ok(nil)
     # @return [Decoding::Decoder<NilClass>]
+    # @see Decoding::Decoders::Match
     def nil = Decoders::Match.new(NilClass)
 
     # Decode a `true` value.
@@ -57,6 +64,7 @@ module Decoding
     # @example
     #   decode(Decoding.true, true) # => Decoding::Ok(true)
     # @return [Decoding::Decoder<TrueClass>]
+    # @see Decoding::Decoders::Match
     def true = Decoders::Match.new(TrueClass)
 
     # Decode a `false` value.
@@ -64,7 +72,25 @@ module Decoding
     # @example
     #   decode(Decoders.false, false) # => Decoding::Ok(false)
     # @return [Decoding::Decoder<FalseClass>]
+    # @see Decoding::Decoders::Match
     def false = Decoders::Match.new(FalseClass)
+
+    # Decode a boolean value (either `true` or `false`).
+    #
+    # @example
+    #   decode(boolean, true) # => Decoding::Ok(true)
+    #   decode(boolean, false) # => Decoding::Ok(false)
+    # @return [Decoding::Decoder<Boolean>]
+    def boolean = any(self.true, self.false)
+
+    # Decode a String value into a symbol.
+    #
+    # @example
+    #   decode(symbol, "foo") # => Decoding::Ok(:foo)
+    # @return [Decoding::Decoder<Symbol>]
+    def symbol = map(string, &:to_sym)
+
+    # @!group Utility decoders
 
     # A decoder that always succeeds with the given value.
     #
@@ -79,6 +105,8 @@ module Decoding
     #   decode(fail("oh no"), "foo") # => Decoding::Err("oh no")
     # @return [Decoding::Decoder<String>]
     def fail(value) = ->(_) { Result.err(value) }
+
+    # @!group Compound decoders
 
     # Decode a value with the given decoder and, if successful, apply a block to
     # the decoded result.
@@ -97,10 +125,12 @@ module Decoding
     #     { "id" => 1, "name" => "john" }
     #   )
     #   # => [1, "john"]
-    # @param decoder [Decoding::Decoder<a>]
-    # @yieldparam value [a]
-    # @yieldreturn value [b]
-    # @return [Decoding::Decoder<b>]
+    # @overload map(decoder, *decoders)
+    #   @param decoder [Decoding::Decoder<a>]
+    #   @yieldparam value [a]
+    #   @yieldreturn [b]
+    #   @return [Decoding::Decoder<b>]
+    # @see Decoding::Decoders::Map
     def map(...) = Decoders::Map.new(...)
 
     # Decode a value by trying many different decoders in order, using the first
@@ -109,17 +139,11 @@ module Decoding
     # @example
     #   decode(any(string, integer), 12) # => Decoding::Ok(12)
     #   decode(any(string, integer), '12') # => Decoding::Ok('12')
-    # @param decoder [Decoding::Decoder<a>]
-    # @return [Decoding::Decoder<a>]
+    # @overload any(decoder, *decoders)
+    #   @param decoder [Decoding::Decoder<a>]
+    #   @return [Decoding::Decoder<a>]
+    # @see Decoding::Decoders::Any
     def any(...) = Decoders::Any.new(...)
-
-    # Decode a boolean value (either `true` or `false`).
-    #
-    # @example
-    #   decode(boolean, true) # => Decoding::Ok(true)
-    #   decode(boolean, false) # => Decoding::Ok(false)
-    # @return [Decoding::Decoder<Boolean>]
-    def boolean = any(self.true, self.false)
 
     # Decode a value that may or may not be `nil`.
     #
@@ -134,26 +158,32 @@ module Decoding
     #
     # @example
     #   decode(field('id', integer), { 'id' => 5 }) # => Decoding::Ok(5)
-    # @param key [Object]
-    # @param decoder [Decoding::Decoder<a>]
-    # @return [Decoding::Decoder<a>]
+    # @overload field(key, decoder)
+    #   @param key [Object]
+    #   @param decoder [Decoding::Decoder<a>]
+    #   @return [Decoding::Decoder<a>]
+    # @see Decoding::Decoders::Field
     def field(...) = Decoders::Field.new(...)
 
     # Decode an array of values using a given decoder.
     #
     # @example
     #   decode(array(integer), [1, 2, 3]) # => Decoding::Ok([1, 2, 3])
-    # @param decoder [Decoding::Decoder<a>]
-    # @return [Decoding::Decoder<Array<a>>]
+    # @overload array(decoder)
+    #   @param decoder [Decoding::Decoder<a>]
+    #   @return [Decoding::Decoder<Array<a>>]
+    # @see Decoding::Decoders::Array
     def array(...) = Decoders::Array.new(...)
 
     # Decode an array element by index using a given decoder.
     #
     # @example
     #   decode(index(0, integer), [1, 2, 3]) # => Decoding::Ok(1)
-    # @param index [Integer]
-    # @param decoder [Decoding::Decoder<a>]
-    # @return [Decoding::Decoder<a>]
+    # @overload index(integer, decoder)
+    #   @param index [Integer]
+    #   @param decoder [Decoding::Decoder<a>]
+    #   @return [Decoding::Decoder<a>]
+    # @see Decoding::Decoders::Index
     def index(...) = Decoders::Index.new(...)
 
     # Decode a Hash with arbitrary contents using two decoders for the keys and
@@ -162,17 +192,12 @@ module Decoding
     # @example
     #   decode(hash(string, integer), { 'john' => 1 })
     #   # => Decoding::Ok({ 'john' => 1 })
-    # @param key_decoder [Decoding::Decoder<a>]
-    # @param value_decoder [Decoding::Decoder<b>]
-    # @return [Decoding::Decoder<Hash<a, b>>]
+    # @overload hash(key_decoder, value_decoder)
+    #   @param key_decoder [Decoding::Decoder<a>]
+    #   @param value_decoder [Decoding::Decoder<b>]
+    #   @return [Decoding::Decoder<Hash<a, b>>]
+    # @see Decoding::Decoders::Hash
     def hash(...) = Decoders::Hash.new(...)
-
-    # Decode a String value into a symbol.
-    #
-    # @example
-    #   decode(symbol, "foo") # => Decoding::Ok(:foo)
-    # @return [Decoding::Decoder<Symbol>]
-    def symbol = map(string, &:to_sym)
 
     # Create a decoder that depends on a previously decoded value.
     #
@@ -188,10 +213,12 @@ module Decoding
     #   # => Decoding::Ok("john")
     #   decode(decoder, { "version" => 2, "fullName" => "john" })
     #   # => Decoding::Ok("john")
-    # @param decoder [Decoding::Decoder<a>]
-    # @yieldparam value [a]
-    # @yieldreturn [Decoding::Decoder<b>]
-    # @return [Decoding::Decoder<b>]
-    def and_then(...) = Decoding::AndThen.new(...)
+    # @overload and_then(deocder)
+    #   @param decoder [Decoding::Decoder<a>]
+    #   @yieldparam value [a]
+    #   @yieldreturn [Decoding::Decoder<b>]
+    #   @return [Decoding::Decoder<b>]
+    # @see Decoding::Decoders::AndThen
+    def and_then(...) = Decoders::AndThen.new(...)
   end
 end

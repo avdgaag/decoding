@@ -13,6 +13,8 @@ module Decoding
         super()
       end
 
+      # @param value [Object]
+      # @return [Decoding::Result<a>]
       def call(value)
         if @pattern === value
           ok(value)

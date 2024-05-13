@@ -5,6 +5,8 @@ require_relative "../decoder"
 module Decoding
   module Decoders
     # Create a decoder that depends on a previously decoded value.
+    #
+    # @see Decoding::Decoders.and_then
     class AndThen < Decoder
       # @param decoder [Decoding::Decoder<a>]
       # @yieldparam [a]
@@ -16,6 +18,8 @@ module Decoding
         super()
       end
 
+      # @param value [Object]
+      # @return [Decoding::Result<b>]
       def call(value)
         @decoder.call(value).and_then do |decoded_value|
           @block.call(decoded_value).call(value)

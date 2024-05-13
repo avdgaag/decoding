@@ -48,7 +48,10 @@ require_relative "decoding/decoders"
 #       D.hash(D.string, D.boolean)
 #     ) { Order.new(*args) }
 #     Decoding.decode(order_decoder, body)
-#     # => Decoding::Ok(#<data Order id: '7EBWXB5', date: 2020-07-25 12:58:00 +0200, status: {"orderPlaced"=>true,"orderShipped"=>true,"outForDelivery"=>true,"orderDelivered"=>false}>)
+#     # => Decoding::Ok(#<data Order
+#       id: '7EBWXB5',
+#       date: 2020-07-25 12:58:00 +0200,
+#       status: {"orderPlaced"=>true,"orderShipped"=>true,"outForDelivery"=>true,"orderDelivered"=>false}>)
 #
 # Decoders take an input value and generate an output value from it. There are
 # decoders for basic Ruby types, compound types such as arrays and hashes,
@@ -95,10 +98,10 @@ require_relative "decoding/decoders"
 #
 # Now, you have a decoder that can work inputs using format version 1 and 2:
 #
-#    Decoding.decode(multiple_version_decoder, "version" => "1", "name" => "John")
-#    # => "John"
-#    Decoding.decode(multiple_version_decoder, "version" => "2", "fullName" => "Paul")
-#    # => "Paul"
+#     Decoding.decode(multiple_version_decoder, "version" => "1", "name" => "John")
+#     # => "John"
+#     Decoding.decode(multiple_version_decoder, "version" => "2", "fullName" => "Paul")
+#     # => "Paul"
 #
 # The return values of decoding are `Decoding::Result` values, which come in
 # `Ok` and `Err` subclasses. These describe how the decoding either succeeded or

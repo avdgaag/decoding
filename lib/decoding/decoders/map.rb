@@ -6,6 +6,8 @@ module Decoding
   module Decoders
     # A decoder that decodes a value and then applies a transformation to it, if
     # successful.
+    #
+    # @see Decoding::Decoders.map
     class Map < Decoder
       # @param decoder [Decoding::Decoder<a>]
       # @yieldparam value [a]

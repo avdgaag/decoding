@@ -6,12 +6,17 @@ require_relative "../decoder"
 module Decoding
   module Decoders
     # Decode an array where all values match a given decoder.
+    #
+    # @see Decoding::Decoders.array
     class Array < Decoder
+      # @param decoder [Decoding::Decoder<a>]
       def initialize(decoder)
         @decoder = decoder.to_decoder
         super()
       end
 
+      # @param value [Object]
+      # @return [Decoding::Result<a>]
       def call(value)
         if value.is_a?(::Array)
           value
