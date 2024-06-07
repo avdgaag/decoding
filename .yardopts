@@ -1,0 +1,7 @@
+--title Decoding
+--markup markdown
+--no-stats
+--no-progress
+lib/**/*.rb
+--readme README.md -
+CHANGELOG.md CODE_OF_CONDUCT.md LICENSE.txt
