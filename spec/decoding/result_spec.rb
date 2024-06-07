@@ -34,11 +34,11 @@ module Decoding
     end
 
     it "unwraps ok values by returning the inner value" do
-      expect(Result.ok(123).unwrap(0)).to eql(123)
+      expect(Result.ok(123).unwrap(0)).to be(123)
     end
 
     it "unwraps err values by returning the default value" do
-      expect(Result.err(123).unwrap(0)).to eql(0)
+      expect(Result.err(123).unwrap(0)).to be(0)
     end
 
     it "creates new ok value by mapping with a block" do
