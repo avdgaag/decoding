@@ -58,11 +58,14 @@ For example, we could parse the above payload like so:
 ```ruby
 Order = Data.define(:id, :date, :status)
 D = Decoding::Decoders
+
+time_decoder = D.map(D.string) { Time.at(_1.to_i) }
 order_decoder = D.map(
   D.field("orderID", D.string),
-  D.map(D.field("orderDate", D.string)) { Time.at(_1.to_i) },
+  D.field("orderDate", time_decoder),
   D.hash(D.string, D.boolean)
 ) { Order.new(*args) }
+
 Decoding.decode(order_decoder, body)
 # => Decoding::Ok(#<data Order
   id: '7EBWXB5',
