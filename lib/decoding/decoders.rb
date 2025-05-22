@@ -8,6 +8,7 @@ require_relative "decoders/array"
 require_relative "decoders/index"
 require_relative "decoders/hash"
 require_relative "decoders/and_then"
+require_relative "decoders/at"
 require_relative "result"
 
 module Decoding
@@ -220,5 +221,22 @@ module Decoding
     #   @return [Decoding::Decoder<b>]
     # @see Decoding::Decoders::AndThen
     def and_then(...) = Decoders::AndThen.new(...)
+
+    # Decode deeply-nested fields.
+    #
+    # @example
+    #   decoder = at('a', 'b', 'c', string)
+    #   decode(decoder, { "a" => { "b" => { "c" => "d" } } })
+    #   # => Decoding::Ok("d")
+    #   decode(decoder, { "a" => { "b" => "d" } })
+    #   # => Decoding::Err("Error at .a.b: expected a Hash, got String")
+    # @overload at(*fields, decoder)
+    #   @param fields [String]
+    #   @param decoder [Decoding::Decoder<a>]
+    #   @return [Decoding::Decoder<a>]
+    # @see Decoding::Decoders::At
+    def at(...)
+      Decoders::At.new(...)
+    end
   end
 end

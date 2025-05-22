@@ -94,6 +94,13 @@ module Decoding
       expect(decode(decoder, [{ "a" => [{ "b" => nil }] }])).to eql(Result.err("Error at .0.a.0.b: expected Integer, got NilClass"))
     end
 
+    it "decodes a deeply nested data structure" do
+      decoder = at("a", "b", "c", string)
+      expect(decode(decoder, { "a" => { "b" => { "c" => "1" } } })).to eql(Result.ok("1"))
+      expect(decode(decoder, { "a" => { "b" => { "c" => 1 } } })).to eql(Result.err("Error at .a.b.c: expected String, got Integer"))
+      expect(decode(decoder, 123)).to eql(Result.err("expected a Hash, got: 123"))
+    end
+
     it "decodes an array element by index using a decoder" do
       expect(decode(index(0, integer), [1, 2, 3])).to eql(Result.ok(1))
     end
