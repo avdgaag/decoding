@@ -6,14 +6,14 @@ module Decoding
   module Decoders
     RSpec.describe Match do
       it "succeeds with values matching the given pattern" do
-        expect(Match.new(/foo/).call("foo bar")).to eql(Result.ok("foo bar"))
-        expect(Match.new(String).call("foo bar")).to eql(Result.ok("foo bar"))
+        expect(Decoding.decode(Match.new(/foo/), "foo bar")).to eql(Result.ok("foo bar"))
+        expect(Decoding.decode(Match.new(String), "foo bar")).to eql(Result.ok("foo bar"))
       end
 
       it "errors with values not matching the given pattern" do
-        expect(Match.new(/foo/).call(123)).to eql(Result.err("expected value matching /foo/, got: 123"))
-        expect(Match.new(String).call(nil)).to eql(Result.err("expected String, got NilClass"))
-        expect(Match.new("other").call(nil)).to eql(Result.err("expected value matching \"other\", got: nil"))
+        expect(Decoding.decode(Match.new(/foo/), 123)).to eql(Result.err("expected value matching /foo/, got: 123"))
+        expect(Decoding.decode(Match.new(String), nil)).to eql(Result.err("expected String, got NilClass"))
+        expect(Decoding.decode(Match.new("other"), nil)).to eql(Result.err("expected value matching \"other\", got: nil"))
       end
     end
   end

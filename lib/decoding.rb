@@ -118,5 +118,5 @@ module Decoding
   # @param decoder [Decoding::Decoder<a>]
   # @param value [Object]
   # @return [Decoding::Result<a>]
-  def decode(decoder, value) = decoder.call(value)
+  def decode(decoder, value) = decoder.call(value).map_err(&:to_s)
 end

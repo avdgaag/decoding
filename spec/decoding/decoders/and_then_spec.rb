@@ -18,16 +18,16 @@ module Decoding
       end
 
       it "succeeds using the given decoder" do
-        expect(decoder.call("version" => 1, "name" => "John")).to eql(Result.ok("John"))
-        expect(decoder.call("version" => 2, "fullName" => "John")).to eql(Result.ok("John"))
+        expect(Decoding.decode(decoder, "version" => 1, "name" => "John")).to eql(Result.ok("John"))
+        expect(Decoding.decode(decoder, "version" => 2, "fullName" => "John")).to eql(Result.ok("John"))
       end
 
       it "fails when the first decoder does not match" do
-        expect(decoder.call("version" => "1", "name" => "John")).to eql(Result.err("expected Integer, got String"))
+        expect(Decoding.decode(decoder, "version" => "1", "name" => "John")).to eql(Result.err("Error at .version: expected Integer, got String"))
       end
 
       it "fails when the second decoder does not match" do
-        expect(decoder.call("version" => 1, "name" => 123)).to eql(Result.err("expected String, got Integer"))
+        expect(Decoding.decode(decoder, "version" => 1, "name" => 123)).to eql(Result.err("Error at .name: expected String, got Integer"))
       end
     end
   end

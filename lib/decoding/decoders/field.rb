@@ -21,7 +21,7 @@ module Decoding
       def call(value)
         if value.is_a?(::Hash)
           if value.key?(@key)
-            @decoder.call(value.fetch(@key))
+            @decoder.call(value.fetch(@key)).map_err { _1.push(@key) }
           else
             err("expected a Hash with key #{@key}")
           end

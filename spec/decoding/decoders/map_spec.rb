@@ -30,7 +30,7 @@ module Decoding
           "name" => "Ringo",
           "admin" => false
         }
-        expect(decoder.call(input)).to eql(Result.ok([1, "Ringo", false]))
+        expect(Decoding.decode(decoder, input)).to eql(Result.ok([1, "Ringo", false]))
       end
 
       it "fails if any of the multiple decoders fail" do
@@ -44,7 +44,7 @@ module Decoding
           "name" => "Ringo",
           "admin" => false
         }
-        expect(decoder.call(input)).to eql(Result.err("expected Integer, got String"))
+        expect(Decoding.decode(decoder, input)).to eql(Result.err("Error at .name: expected Integer, got String"))
       end
     end
   end

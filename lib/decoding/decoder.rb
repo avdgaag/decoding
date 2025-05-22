@@ -2,6 +2,7 @@
 
 require "forwardable"
 require_relative "result"
+require_relative "failure"
 
 module Decoding
   # A decoder is a callable object that reads any input value and returns an
@@ -18,5 +19,9 @@ module Decoding
 
     # @return [Decoding::Decoder<a>]
     def to_decoder = self
+
+    # @param str [String]
+    # @return [Decoding::Failure]
+    def failure(str) = Decoding::Failure.new(str)
   end
 end

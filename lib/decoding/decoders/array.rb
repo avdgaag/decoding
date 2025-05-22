@@ -21,7 +21,7 @@ module Decoding
         if value.is_a?(::Array)
           value
             .each_with_index
-            .map { |v, i| @decoder.call(v).map_err { |e| "error decoding array item #{i}: #{e}" } }
+            .map { |v, i| @decoder.call(v).map_err { _1.push(i) } }
             .then { all _1 }
         else
           err("expected an Array, got: #{value.class}")

@@ -8,23 +8,23 @@ module Decoding
   module Decoders
     RSpec.describe Field do
       it "succeeds when given a hash with the given key and matching value" do
-        field = Field.new("name", Decoders.string)
-        expect(field.call({ "name" => "John" })).to eql(Result.ok("John"))
+        decoder = Field.new("name", Decoders.string)
+        expect(Decoding.decode(decoder, { "name" => "John" })).to eql(Result.ok("John"))
       end
 
       it "fails when given a hash with the given key but non-matching value" do
-        field = Field.new("name", Decoders.string)
-        expect(field.call({ "name" => nil })).to eql(Result.err("expected String, got NilClass"))
+        decoder = Field.new("name", Decoders.string)
+        expect(Decoding.decode(decoder, { "name" => nil })).to eql(Result.err("Error at .name: expected String, got NilClass"))
       end
 
       it "fails when given a hash without the given key" do
-        field = Field.new("name", Decoders.string)
-        expect(field.call({ "age" => 12 })).to eql(Result.err("expected a Hash with key name"))
+        decoder = Field.new("name", Decoders.string)
+        expect(Decoding.decode(decoder, { "age" => 12 })).to eql(Result.err("expected a Hash with key name"))
       end
 
       it "fails when given something other than a hash" do
-        field = Field.new("name", Decoders.string)
-        expect(field.call(nil)).to eql(Result.err("expected a Hash, got: nil"))
+        decoder = Field.new("name", Decoders.string)
+        expect(Decoding.decode(decoder, nil)).to eql(Result.err("expected a Hash, got: nil"))
       end
     end
   end

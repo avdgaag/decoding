@@ -54,7 +54,7 @@ module Decoding
     end
 
     it "fails with a static value" do
-      expect(decode(fail(456), 123)).to eql(Result.err(456))
+      expect(decode(fail("456"), 123)).to eql(Result.err("456"))
     end
 
     it "transforms a successfully decoded value with a block" do
@@ -78,10 +78,20 @@ module Decoding
 
     it "decodes a field from a hash" do
       expect(decode(field("id", integer), "id" => 123)).to eql(Result.ok(123))
+      expect(decode(field("other", integer), "id" => 123)).to eql(Result.err("expected a Hash with key other"))
+      expect(decode(field("id", string), "id" => 123)).to eql(Result.err("Error at .id: expected String, got Integer"))
+      expect(decode(field("id", integer), 123)).to eql(Result.err("expected a Hash, got: 123"))
     end
 
     it "decodes an array of values using a decoder" do
       expect(decode(array(integer), [1, 2, 3])).to eql(Result.ok([1, 2, 3]))
+      expect(decode(array(integer), [1, "2", 3])).to eql(Result.err("Error at .1: expected Integer, got String"))
+    end
+
+    it "provides the path for a nested decoder" do
+      decoder = array(field("a", array(field("b", integer))))
+      expect(decode(decoder, [{ "a" => [{ "b" => 1 }] }])).to eql(Result.ok([[1]]))
+      expect(decode(decoder, [{ "a" => [{ "b" => nil }] }])).to eql(Result.err("Error at .0.a.0.b: expected Integer, got NilClass"))
     end
 
     it "decodes an array element by index using a decoder" do
