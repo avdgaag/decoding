@@ -124,5 +124,10 @@ module Decoding
       expect(decode(decoder,  "version" => 1, "name" => "john")).to eql(Result.ok("john"))
       expect(decode(decoder,  "version" => 2, "fullName" => "john")).to eql(Result.ok("john"))
     end
+
+    it "decodes multiple decoders into a hash" do
+      decoder = decode_hash({ id: field("id", integer), name: field("name", string) })
+      expect(decode(decoder, "id" => 1, "name" => "John")).to eql(Result.ok(id: 1, name: "John"))
+    end
   end
 end

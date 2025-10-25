@@ -200,6 +200,27 @@ module Decoding
     # @see Decoding::Decoders::Hash
     def hash(...) = Decoders::Hash.new(...)
 
+    # Decode a value into a hash using multiple decoders.
+    #
+    # This is a shortcut for:
+    #
+    #   deocde(map(field("id", integer), field("name", string)) { |id, name|
+    #     { id:, name: }
+    #   }, { "id" => 1, "name" => "John" })
+    #   # => Decoding::Ok({ id: 1, name: "John" })
+    #
+    # @example
+    #   decode(decode_hash(
+    #     id: field("id", integer)
+    #   ), { "id" => 1 })
+    #   # => Decode::Ok({ id: 1 })
+    # @return Decoding::Decoder
+    def decode_hash(decoders)
+      map(*decoders.values) do |*values|
+        decoders.keys.zip(values).to_h
+      end
+    end
+
     # Create a decoder that depends on a previously decoded value.
     #
     # @example
