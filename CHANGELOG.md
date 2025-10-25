@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [0.2.0] - 2025-10-25
+
 * Added `decode_hash`, `regexp` and `original` decoders
 * Fixed incorrect `Decoding::Failure` value comparisons
 * Fixed some decoders incorrectly returning `String` values rather than
