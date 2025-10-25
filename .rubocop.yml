@@ -19,6 +19,10 @@ Style/StringLiteralsInInterpolation:
 Layout/LineLength:
   Max: 140
 
+Metrics/ModuleLength:
+  Exclude:
+    - spec/**/*_spec.rb
+
 Metrics/BlockLength:
   Exclude:
     - spec/**/*_spec.rb

@@ -33,7 +33,7 @@ module Decoding
     # @param re [Regexp, String]
     # @return [Decoding::Decoder<String>]
     # @see Decoding::Decoders::Match
-    def regexp(re) = Decoders::Match.new(Regexp.new(re))
+    def regexp(regex) = Decoders::Match.new(Regexp.new(regex))
 
     # Decode any integer value.
     #
