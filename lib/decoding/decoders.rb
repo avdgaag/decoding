@@ -113,7 +113,7 @@ module Decoding
     # @example
     #   decode(fail("oh no"), "foo") # => Decoding::Err("oh no")
     # @return [Decoding::Decoder<String>]
-    def fail(value) = ->(_) { Result.err(value) }
+    def fail(value) = ->(_) { Result.err(Decoding::Failure.new(value)) }
 
     # A decoder that returns the input value, unaltered.
     #

@@ -19,7 +19,7 @@ module Decoding
 
       it "fails when none of the decoders match" do
         any = Any.new(Decoders.integer, Decoders.float, Decoders.string)
-        expect(any.call(true)).to eql(Result.err("None of the decoders matched"))
+        expect(any.call(true)).to eql(Result.err(Decoding::Failure.new("None of the decoders matched")))
       end
     end
   end

@@ -14,7 +14,7 @@ module Decoding
 
       it "fails when some items can not be decoded with the decoder" do
         hash = Hash.new(Decoders.string, Decoders.integer)
-        expect(hash.call({ "foo" => "bar" })).to eql(Result.err("error decoding value for key \"foo\": expected Integer, got String"))
+        expect(hash.call({ "foo" => "bar" })).to eql(Result.err(Failure.new("error decoding value for key \"foo\": expected Integer, got String")))
       end
 
       it "fails when given something other than an hash" do

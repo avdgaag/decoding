@@ -25,11 +25,11 @@ module Decoding
               [
                 @key_decoder
                   .call(k)
-                  .map_err { |e| "error decoding key #{k.inspect}: #{e}" },
+                  .map_err { |e| failure("error decoding key #{k.inspect}: #{e}") },
 
                 @value_decoder
                   .call(v)
-                  .map_err { |e| "error decoding value for key #{k.inspect}: #{e}" }
+                  .map_err { |e| failure("error decoding value for key #{k.inspect}: #{e}") }
               ]
             )
           end

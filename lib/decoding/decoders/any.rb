@@ -10,9 +10,6 @@ module Decoding
     #
     # @see Decoding::Decoders.any
     class Any < Decoder
-      # @private
-      Err = Result.err("None of the decoders matched")
-
       # @param decoder [Decoding::Decoder<Object>]
       # @param decoders [Decoding::Decoder<Object>]
       def initialize(decoder, *decoders)
@@ -23,7 +20,8 @@ module Decoding
       # @param value [Object]
       # @return [Decoding::Result<Object>]
       def call(value)
-        @decoders.lazy.map { _1.call(value) }.find(-> { Err }, &:ok?)
+        err_proc = -> { err(failure("None of the decoders matched")) }
+        @decoders.lazy.map { _1.call(value) }.find(err_proc, &:ok?)
       end
     end
   end
