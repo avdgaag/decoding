@@ -11,6 +11,7 @@ module Decoding
   # @abstract
   class Decoder
     extend Forwardable
+
     def_delegators "Decoding::Result", :all, :ok, :err
 
     # @param value [Object]

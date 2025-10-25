@@ -23,11 +23,13 @@ module Decoding
       end
 
       it "fails when the first decoder does not match" do
-        expect(Decoding.decode(decoder, "version" => "1", "name" => "John")).to eql(Result.err("Error at .version: expected Integer, got String"))
+        expect(Decoding.decode(decoder, "version" => "1", "name" => "John"))
+          .to eql(Result.err("Error at .version: expected Integer, got String"))
       end
 
       it "fails when the second decoder does not match" do
-        expect(Decoding.decode(decoder, "version" => 1, "name" => 123)).to eql(Result.err("Error at .name: expected String, got Integer"))
+        expect(Decoding.decode(decoder, "version" => 1, "name" => 123))
+          .to eql(Result.err("Error at .name: expected String, got Integer"))
       end
     end
   end
