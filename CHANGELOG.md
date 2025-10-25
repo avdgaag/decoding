@@ -1,6 +1,6 @@
 ## [Unreleased]
 
-* Added `decode_hash` decoder
+* Added `decode_hash` and `original` decoders
 
 ## [0.1.0] - 2024-05-08
 

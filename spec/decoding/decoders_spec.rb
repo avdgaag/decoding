@@ -129,5 +129,9 @@ module Decoding
       decoder = decode_hash({ id: field("id", integer), name: field("name", string) })
       expect(decode(decoder, "id" => 1, "name" => "John")).to eql(Result.ok(id: 1, name: "John"))
     end
+
+    it "decodes values into themselves using original" do
+      expect(decode(original, [1, 2, 3])).to eql(Result.ok([1, 2, 3]))
+    end
   end
 end

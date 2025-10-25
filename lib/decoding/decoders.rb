@@ -9,6 +9,7 @@ require_relative "decoders/index"
 require_relative "decoders/hash"
 require_relative "decoders/and_then"
 require_relative "decoders/at"
+require_relative "decoders/pass"
 require_relative "result"
 
 module Decoding
@@ -106,6 +107,13 @@ module Decoding
     #   decode(fail("oh no"), "foo") # => Decoding::Err("oh no")
     # @return [Decoding::Decoder<String>]
     def fail(value) = ->(_) { Result.err(value) }
+
+    # A decoder that returns the input value, unaltered.
+    #
+    # @example
+    #   decode(original, [1, 2]) # => Decoding::Ok([1, 2])
+    # @return [Decoding::Decoder<Object>]
+    def original = Decoders::Pass.new
 
     # @!group Compound decoders
 
