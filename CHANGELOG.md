@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [0.2.1] - 2025-10-25
+
+* Fixed missed error not returning `Decoding::Failure`
+
 ## [0.2.0] - 2025-10-25
 
 * Added `decode_hash`, `regexp` and `original` decoders

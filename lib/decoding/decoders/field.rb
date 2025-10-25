@@ -23,10 +23,10 @@ module Decoding
           if value.key?(@key)
             @decoder.call(value.fetch(@key)).map_err { _1.push(@key) }
           else
-            err("expected a Hash with key #{@key}")
+            err(failure("expected a Hash with key #{@key}"))
           end
         else
-          err("expected a Hash, got: #{value.inspect}")
+          err(failure("expected a Hash, got: #{value.inspect}"))
         end
       end
     end
