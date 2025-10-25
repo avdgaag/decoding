@@ -133,5 +133,12 @@ module Decoding
     it "decodes values into themselves using original" do
       expect(decode(original, [1, 2, 3])).to eql(Result.ok([1, 2, 3]))
     end
+
+    it "decodes values matching a regular expression" do
+      expect(decode(regexp(/o|a/), "foo")).to eql(Result.ok("foo"))
+      expect(decode(regexp("o|a"), "foo")).to eql(Result.ok("foo"))
+      expect(decode(regexp(/o|a/), "qux")).to eql(Result.err("expected value matching /o|a/, got: \"qux\""))
+      expect(decode(regexp("o|a"), "qux")).to eql(Result.err("expected value matching /o|a/, got: \"qux\""))
+    end
   end
 end

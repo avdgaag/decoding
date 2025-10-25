@@ -28,6 +28,13 @@ module Decoding
     # @see Decoding::Decoders::Match
     def string = Decoders::Match.new(String)
 
+    # Decode any string value that matches a regular expression.
+    #
+    # @param re [Regexp, String]
+    # @return [Decoding::Decoder<String>]
+    # @see Decoding::Decoders::Match
+    def regexp(re) = Decoders::Match.new(Regexp.new(re))
+
     # Decode any integer value.
     #
     # @example
