@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [0.2.2] - 2025-10-25
+
 * Added `Result#unwrap_err`
 
 ## [0.2.1] - 2025-10-25
