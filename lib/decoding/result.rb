@@ -79,6 +79,14 @@ module Decoding
     # @return [Object]
     def unwrap(default_value) = default_value
 
+    # Extract the error value out of a `Result` value. In case of an `Err`, this
+    # returns the result's value. In case of an `Ok`, the given `default_value`
+    # is returned.
+    #
+    # @param default_value [Object]
+    # @return [Object]
+    def unwrap_err(default_value) = default_value
+
     # Create a new `Result` value for the result of the block applied to this
     # result's `value`. `Err` values are returned as-is.
     #
@@ -149,5 +157,6 @@ module Decoding
 
     def err? = true
     def map_err = self.class.new(yield value)
+    def unwrap_err(_) = value
   end
 end

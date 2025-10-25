@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+* Added `Result#unwrap_err`
+
 ## [0.2.1] - 2025-10-25
 
 * Fixed missed error not returning `Decoding::Failure`
