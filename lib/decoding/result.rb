@@ -52,6 +52,10 @@ module Decoding
       freeze
     end
 
+    def deconstruct
+      [value]
+    end
+
     def eql?(other)
       other.is_a?(self.class) && value == other.value
     end

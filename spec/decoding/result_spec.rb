@@ -83,5 +83,16 @@ module Decoding
       expect(Result.ok(5).and_then { Result.err("error") }).to eql(Result.err("error"))
       expect(Result.err("error").and_then { Result.ok(_1 * 2) }).to eql(Result.err("error"))
     end
+
+    it 'supports pattern matching on results' do
+      case Result.ok(5)
+      in Decoding::Ok(n)
+        expect(n).to be(5)
+      end
+      case Result.err("error")
+      in Decoding::Err(str)
+        expect(str).to eql("error")
+      end
+    end
   end
 end

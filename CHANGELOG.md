@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+* Implement `Decoding::Result#deconstruct` to support pattern matching on result values.
+
 ## [0.2.2] - 2025-10-25
 
 * Added `Result#unwrap_err`
