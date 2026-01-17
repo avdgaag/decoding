@@ -17,7 +17,7 @@ module Decoding
       end
 
       # @param value [Object]
-      # @return [Deceoding::Result<a>]
+      # @return [Decoding::Result<a>]
       def call(value)
         if value.is_a?(::Hash)
           if value.key?(@key)

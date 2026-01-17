@@ -9,7 +9,7 @@ module Decoding
   # error, the `array` decoder can push `3` to the stack to indicate that
   # happened at index 3 in its input value.
   class Failure
-    # @paramn msg [String]
+    # @param msg [String]
     def initialize(msg)
       @msg = msg
       @path = []
