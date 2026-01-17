@@ -19,24 +19,22 @@ module Decoding
       # @param value [Object]
       # @return [Decoding::Result<Hash<a, b>>]
       def call(value)
-        if value.is_a?(::Hash)
-          key_value_pairs = value.map do |k, v|
-            all(
-              [
-                @key_decoder
-                  .call(k)
-                  .map_err { |e| failure("error decoding key #{k.inspect}: #{e}") },
+        return err(failure("expected Hash, got #{value.class}")) unless value.is_a?(::Hash)
 
-                @value_decoder
-                  .call(v)
-                  .map_err { |e| failure("error decoding value for key #{k.inspect}: #{e}") }
-              ]
-            )
-          end
-          all(key_value_pairs).map(&:to_h)
-        else
-          err(failure("expected Hash, got #{value.class}"))
+        key_value_pairs = value.map do |k, v|
+          all(
+            [
+              @key_decoder
+                .call(k)
+                .map_err { |e| failure("error decoding key #{k.inspect}: #{e}") },
+
+              @value_decoder
+                .call(v)
+                .map_err { |e| failure("error decoding value for key #{k.inspect}: #{e}") }
+            ]
+          )
         end
+        all(key_value_pairs).map(&:to_h)
       end
     end
   end
