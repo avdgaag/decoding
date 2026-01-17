@@ -31,6 +31,14 @@ module Decoding
         expect(Decoding.decode(decoder, "version" => 1, "name" => 123))
           .to eql(Result.err("Error at .name: expected String, got Integer"))
       end
+
+      it "handles errors in the and_then block" do
+        failing_decoder = AndThen.new(Decoders.integer) do |_value|
+          raise StandardError, "block error"
+        end
+        expect(Decoding.decode(failing_decoder, 42))
+          .to eql(Result.err("error in and_then block: block error"))
+      end
     end
   end
 end

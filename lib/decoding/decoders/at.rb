@@ -17,7 +17,7 @@ module Decoding
       end
 
       # @param value [Object]
-      # @return [Deceoding::Result<a>]
+      # @return [Decoding::Result<a>]
       def call(value)
         first, *rest = @keys.reverse
         nested_decoder = rest.reduce(Decoders::Field.new(first, @decoder)) do |acc, k|

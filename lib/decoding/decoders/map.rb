@@ -24,6 +24,8 @@ module Decoding
         Result
           .all(@decoders.map { _1.call(value) })
           .map { @block.call(*_1) }
+      rescue StandardError => e
+        err(failure("error in map block: #{e.message}"))
       end
     end
   end

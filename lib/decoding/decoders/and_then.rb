@@ -24,6 +24,8 @@ module Decoding
         @decoder.call(value).and_then do |decoded_value|
           @block.call(decoded_value).call(value)
         end
+      rescue StandardError => e
+        err(failure("error in and_then block: #{e.message}"))
       end
     end
   end

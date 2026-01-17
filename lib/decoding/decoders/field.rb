@@ -11,13 +11,13 @@ module Decoding
       # @param key [Object]
       # @param decoder [Decoding::Decoder<a>]
       def initialize(key, decoder)
-        @key = key.to_str
+        @key = String(key)
         @decoder = decoder.to_decoder
         super()
       end
 
       # @param value [Object]
-      # @return [Deceoding::Result<a>]
+      # @return [Decoding::Result<a>]
       def call(value)
         if value.is_a?(::Hash)
           if value.key?(@key)

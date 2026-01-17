@@ -30,7 +30,7 @@ module Decoding
 
     # Decode any string value that matches a regular expression.
     #
-    # @param re [Regexp, String]
+    # @param regex [Regexp, String]
     # @return [Decoding::Decoder<String>]
     # @see Decoding::Decoders::Match
     def regexp(regex) = Decoders::Match.new(Regexp.new(regex))

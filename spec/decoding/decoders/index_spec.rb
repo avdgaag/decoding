@@ -14,17 +14,17 @@ module Decoding
 
       it "fails when some items can not be decoded with the decoder" do
         index = Index.new(0, Decoders.integer)
-        expect(index.call(["foo"])).to eql(Result.err("error decoding array item 0: expected Integer, got String"))
+        expect(index.call(["foo"])).to eql(Result.err(Failure.new("expected Integer, got String").push(0)))
       end
 
       it "fails when the given index does not exist in the array" do
         index = Index.new(1, Decoders.integer)
-        expect(index.call([1])).to eql(Result.err("error decoding array: index 1 outside of array bounds: -1...1"))
+        expect(index.call([1])).to eql(Result.err(Failure.new("error decoding array: index 1 outside of array bounds: -1...1")))
       end
 
       it "fails when given something other than an array" do
         index = Index.new(0, Decoders.integer)
-        expect(index.call(true)).to eql(Result.err("expected an Array, got: TrueClass"))
+        expect(index.call(true)).to eql(Result.err(Failure.new("expected an Array, got: TrueClass")))
       end
     end
   end
