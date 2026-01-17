@@ -46,6 +46,14 @@ module Decoding
         }
         expect(Decoding.decode(decoder, input)).to eql(Result.err("Error at .name: expected Integer, got String"))
       end
+
+      it "handles errors in the map block" do
+        failing_decoder = Map.new(Decoders.integer) do |_value|
+          raise StandardError, "block error"
+        end
+        expect(Decoding.decode(failing_decoder, 42))
+          .to eql(Result.err("error in map block: block error"))
+      end
     end
   end
 end

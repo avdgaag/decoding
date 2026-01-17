@@ -22,6 +22,12 @@ module Decoding
         hash = Hash.new(Decoders.string, Decoders.integer)
         expect(hash.call(true)).to eql(Result.err(Failure.new("expected Hash, got TrueClass")))
       end
+
+      it "fails when a key cannot be decoded" do
+        hash = Hash.new(Decoders.integer, Decoders.string)
+        expect(hash.call({ "foo" => "bar" }))
+          .to eql(Result.err(Failure.new("error decoding key \"foo\": expected Integer, got String")))
+      end
     end
   end
 end
