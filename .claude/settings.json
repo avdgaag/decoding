@@ -1,0 +1,39 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "mcp__acp__Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/allow-rspec.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '## Current Git Branch' && git branch --show-current && echo '\n## Pending Changes' && git status --short",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "mcp__acp__Edit|mcp__acp__Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bundle exec rubocop -a \"$CLAUDE_TOOL_RESULT_file_path\" 2>&1 || true",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
