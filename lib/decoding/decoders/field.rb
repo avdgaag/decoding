@@ -11,7 +11,7 @@ module Decoding
       # @param key [Object]
       # @param decoder [Decoding::Decoder<a>]
       def initialize(key, decoder)
-        @key = key.to_str
+        @key = String(key)
         @decoder = decoder.to_decoder
         super()
       end
