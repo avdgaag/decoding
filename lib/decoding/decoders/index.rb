@@ -23,13 +23,13 @@ module Decoding
       # @param value [Object]
       # @return [Decoding::Decoder<Object>]
       def call(value)
-        return err("expected an Array, got: #{value.class}") unless value.is_a?(::Array)
+        return err(failure("expected an Array, got: #{value.class}")) unless value.is_a?(::Array)
 
         @decoder
           .call(value.fetch(@index))
-          .map_err { "error decoding array item #{@index}: #{_1}" }
+          .map_err { _1.push(@index) }
       rescue IndexError => e
-        err("error decoding array: #{e}")
+        err(failure("error decoding array: #{e}"))
       end
     end
   end

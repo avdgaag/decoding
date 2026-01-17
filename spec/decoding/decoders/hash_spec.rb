@@ -20,7 +20,7 @@ module Decoding
 
       it "fails when given something other than an hash" do
         hash = Hash.new(Decoders.string, Decoders.integer)
-        expect(hash.call(true)).to eql(Result.err("expected Hash, got TrueClass"))
+        expect(hash.call(true)).to eql(Result.err(Failure.new("expected Hash, got TrueClass")))
       end
     end
   end

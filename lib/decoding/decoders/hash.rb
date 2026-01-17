@@ -35,7 +35,7 @@ module Decoding
           end
           all(key_value_pairs).map(&:to_h)
         else
-          err("expected Hash, got #{value.class}")
+          err(failure("expected Hash, got #{value.class}"))
         end
       end
     end

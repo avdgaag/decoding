@@ -24,7 +24,7 @@ module Decoding
             .map { |v, i| @decoder.call(v).map_err { _1.push(i) } }
             .then { all _1 }
         else
-          err("expected an Array, got: #{value.class}")
+          err(failure("expected an Array, got: #{value.class}"))
         end
       end
     end
