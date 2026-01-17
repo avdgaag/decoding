@@ -1,6 +1,6 @@
 ## [Unreleased]
 
-## [0.2.3]
+## [0.2.3] - 2025-10-25
 
 * Implement `Decoding::Result#deconstruct` to support pattern matching on result values.
 
