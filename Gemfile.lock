@@ -7,18 +7,39 @@ GEM
   remote: https://rubygems.org/
   specs:
     ast (2.4.2)
+    date (3.5.1)
     diff-lcs (1.5.1)
     docile (1.4.1)
+    erb (6.0.1)
+    io-console (0.8.2)
+    irb (1.16.0)
+      pp (>= 0.6.0)
+      rdoc (>= 4.0.0)
+      reline (>= 0.4.2)
     json (2.7.2)
     language_server-protocol (3.17.0.3)
+    logger (1.7.0)
+    ostruct (0.6.3)
     parallel (1.24.0)
     parser (3.3.1.0)
       ast (~> 2.4.1)
       racc
+    pp (0.6.3)
+      prettyprint
+    prettyprint (0.2.0)
+    psych (5.3.1)
+      date
+      stringio
     racc (1.7.3)
     rainbow (3.1.1)
     rake (13.2.1)
+    rdoc (7.0.3)
+      erb
+      psych (>= 4.0.0)
+      tsort
     regexp_parser (2.9.0)
+    reline (0.6.3)
+      io-console (~> 0.5)
     rexml (3.2.6)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
@@ -69,6 +90,8 @@ GEM
       simplecov_json_formatter (~> 0.1)
     simplecov-html (0.13.2)
     simplecov_json_formatter (0.1.4)
+    stringio (3.2.0)
+    tsort (0.2.0)
     unicode-display_width (2.5.0)
     yard (0.9.36)
 
@@ -78,7 +101,11 @@ PLATFORMS
 
 DEPENDENCIES
   decoding!
+  irb
+  logger
+  ostruct
   rake (~> 13.0)
+  rdoc
   rspec (~> 3.0)
   rubocop (~> 1.21)
   rubocop-performance
