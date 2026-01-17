@@ -10,9 +10,11 @@ module Decoding
   # happened at index 3 in its input value.
   class Failure
     # @param msg [String]
-    def initialize(msg)
+    # @param path [Array] Internal parameter for creating copies with updated paths
+    def initialize(msg, path = [])
       @msg = msg
-      @path = []
+      @path = path.dup.freeze
+      freeze
     end
 
     def eql?(other)
@@ -23,12 +25,12 @@ module Decoding
     alias == eql?
 
     # Add segments to the stack of errors.
+    # Returns a new Failure instance with the updated path.
     #
     # @param segment [String]
     # @return [Decoding::Failure]
     def push(segment)
-      @path << segment
-      self
+      self.class.new(@msg, @path + [segment])
     end
 
     def to_s
