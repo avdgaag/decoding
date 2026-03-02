@@ -1,5 +1,6 @@
 ## [Unreleased]
 
+* Make `succeed` and `fail` proper, composable decoders
 * Ensure different decoders use the same error values
 * Turn exceptions in decoder blocks into errors
 * Use immutable failure values as errors

@@ -10,6 +10,8 @@ require_relative "decoders/hash"
 require_relative "decoders/and_then"
 require_relative "decoders/at"
 require_relative "decoders/pass"
+require_relative "decoders/succeed"
+require_relative "decoders/fail"
 require_relative "result"
 
 module Decoding
@@ -106,14 +108,14 @@ module Decoding
     # @example
     #   decode(succeed(5), "foo") # => Decoding::Ok(5)
     # @return [Decoding::Decoder<String>]
-    def succeed(value) = ->(_) { Result.ok(value) }
+    def succeed(value) = Decoders::Succeed.new(value)
 
     # A decoder that always fails with the given value.
     #
     # @example
     #   decode(fail("oh no"), "foo") # => Decoding::Err("oh no")
     # @return [Decoding::Decoder<String>]
-    def fail(value) = ->(_) { Result.err(Decoding::Failure.new(value)) }
+    def fail(value) = Decoders::Fail.new(value)
 
     # A decoder that returns the input value, unaltered.
     #
