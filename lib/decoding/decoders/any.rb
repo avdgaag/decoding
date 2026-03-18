@@ -20,8 +20,18 @@ module Decoding
       # @param value [Object]
       # @return [Decoding::Result<Object>]
       def call(value)
-        err_proc = -> { err(failure("None of the decoders matched")) }
-        @decoders.lazy.map { _1.call(value) }.find(err_proc, &:ok?)
+        failures = []
+        @decoders.each do |decoder|
+          result = decoder.call(value)
+
+          # NOTE: we could've pattern matched here but that would create an
+          # unreachable `else` clause triggering code coverage issues. This
+          # explicit way ensures we know every code path is touched.
+          return result if result.ok?
+
+          failures << result.unwrap_err(nil)
+        end
+        err(failure("None of the decoders matched:\n#{failures.map { "  - #{_1}" }.join("\n")}"))
       end
     end
   end

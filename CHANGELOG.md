@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+* Report all error messages in the `any` decoder
+
 ## [0.2.4]
 
 * Make `succeed` and `fail` proper, composable decoders
