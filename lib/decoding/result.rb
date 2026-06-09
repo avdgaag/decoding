@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 module Decoding
+  # Raised when calling {Result#unwrap!} on an `Err` value.
+  class UnwrapError < StandardError; end
+
   # A result represent the outcome of some computation that can succeed or fail.
   # The results are represented with two subclasses of `Result`: `Ok` and `Err`.
   # Each hold a single result value.
@@ -83,6 +86,14 @@ module Decoding
     # @return [Object]
     def unwrap(default_value) = default_value
 
+    # Extract the value out of a `Result` value. In case of an `Ok`, this
+    # returns the result's value. In case of an `Err`, a {UnwrapError} is
+    # raised with the error value as its message.
+    #
+    # @raise [Decoding::UnwrapError] if the result is an `Err` value.
+    # @return [Object]
+    def unwrap! = raise(UnwrapError, value.to_s)
+
     # Extract the error value out of a `Result` value. In case of an `Err`, this
     # returns the result's value. In case of an `Ok`, the given `default_value`
     # is returned.
@@ -142,6 +153,7 @@ module Decoding
 
     def ok? = true
     def unwrap(_) = value
+    def unwrap! = value
     def map = self.class.new(yield value)
 
     def and(other)

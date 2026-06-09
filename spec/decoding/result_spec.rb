@@ -49,6 +49,14 @@ module Decoding
       expect(Result.ok(123).unwrap_err(0)).to be(0)
     end
 
+    it "unwrap! returns the inner value for ok values" do
+      expect(Result.ok(123).unwrap!).to be(123)
+    end
+
+    it "unwrap! raises an error for err values" do
+      expect { Result.err("boom").unwrap! }.to raise_error(Decoding::UnwrapError, "boom")
+    end
+
     it "creates new ok value by mapping with a block" do
       expect(Result.ok(123).map { _1 * 2 }).to eql(Result.ok(246))
     end

@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+* Add `Decoding::Result#unwrap!`
+
 ## [0.2.5]
 
 * Report all error messages in the `any` decoder
