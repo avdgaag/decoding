@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [0.2.6]
+
 * Add `Decoding::Result#unwrap!`
 
 ## [0.2.5]
