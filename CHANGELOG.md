@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [0.3.0]
+
 * Add `Decoding::Data` for creating decodable data classes
 
 ## [0.2.6]
