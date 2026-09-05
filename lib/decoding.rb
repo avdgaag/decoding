@@ -2,6 +2,7 @@
 
 require_relative "decoding/version"
 require_relative "decoding/decoders"
+require_relative "decoding/data"
 
 # Decoding is a library to help transform unknown external data into neat values
 # with known shapes. Consider calling an HTTP API: you might pull in whatever

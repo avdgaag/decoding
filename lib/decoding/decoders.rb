@@ -233,6 +233,8 @@ module Decoding
     #   # => Decode::Ok({ id: 1 })
     # @return Decoding::Decoder
     def decode_hash(decoders)
+      return succeed({}) if decoders.empty?
+
       map(*decoders.values) do |*values|
         decoders.keys.zip(values).to_h
       end

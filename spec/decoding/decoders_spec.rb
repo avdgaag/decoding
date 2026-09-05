@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require_relative "../../lib/decoding"
-require_relative "../../lib/decoding/decoders"
 
 module Decoding
   RSpec.describe Decoders do
@@ -128,6 +127,11 @@ module Decoding
     it "decodes multiple decoders into a hash" do
       decoder = decode_hash({ id: field("id", integer), name: field("name", string) })
       expect(decode(decoder, "id" => 1, "name" => "John")).to eql(Result.ok(id: 1, name: "John"))
+    end
+
+    it "decodes into an empty hash given no decoders" do
+      decoder = decode_hash({})
+      expect(decode(decoder, "id" => 1, "name" => "John")).to eql(Result.ok({}))
     end
 
     it "decodes values into themselves using original" do

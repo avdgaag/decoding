@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+* Add `Decoding::Data` for creating decodable data classes
+
 ## [0.2.6]
 
 * Add `Decoding::Result#unwrap!`
