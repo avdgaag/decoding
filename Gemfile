@@ -11,7 +11,7 @@ gem "rubocop", "~> 1.21"
 gem "rubocop-performance"
 gem "rubocop-rake"
 gem "rubocop-rspec"
-gem "simplecov", "~> 0.22", require: false
+gem "simplecov", "~> 1.2", require: false
 gem "yard", "~> 0.9.36"
 
 # Required for Ruby 4.0+ (removed from default gems)
