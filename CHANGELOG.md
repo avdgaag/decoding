@@ -1,5 +1,6 @@
 ## [Unreleased]
 
+* Add `uri` decoder for URI objects and strings that can be parsed as one, available after `require "decoding/decoders/uri"`
 * Add `map_err` decoder for replacing the error message of a failed decoder
 
 ## [0.3.0]

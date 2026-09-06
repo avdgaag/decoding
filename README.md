@@ -130,7 +130,6 @@ The following decoders are included:
     * `boolean`
     * `symbol`
     * `regexp`
-    * `uri`
 * Utility decoders
     * `succeed`
     * `fail`
@@ -147,6 +146,19 @@ The following decoders are included:
     * `index`
     * `hash`
     * `at`
+
+### Optional decoders
+
+Some decoders depend on parts of the standard library that not every application needs, so they are not loaded by default. Require them explicitly to make them available:
+
+* `uri` -- decodes a `URI` object, or a string that can be parsed as one:
+
+```ruby
+require "decoding/decoders/uri"
+
+D.decode(D.uri, "https://example.com") # => Decoding::Ok(URI("https://example.com"))
+D.decode(D.uri, 123)                   # => Decoding::Err("expected a URI, got 123")
+```
 
 ## Development
 
