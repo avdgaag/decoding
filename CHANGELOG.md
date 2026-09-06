@@ -2,6 +2,7 @@
 
 * Add `uri` decoder for URI objects and strings that can be parsed as one, available after `require "decoding/decoders/uri"`
 * Add `map_err` decoder for replacing the error message of a failed decoder
+* Add `Decoding.decode!` for decoding a value, raising `Decoding::UnwrapError` when decoding fails
 * Report the location of errors nested inside a `hash` decoder as a path, like `field` and `array` do, rather than flattening it into the error message.
 * Give the `boolean` decoder its own error message, rather than reporting the failures of the decoders it is built from
 * Use consistent phrasing for the error messages of the `match`, `field`, `array` and `index` decoders

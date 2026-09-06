@@ -126,6 +126,14 @@ Decoding.decode(multiple_version_decoder, "version" => "2", "fullName" => "Paul"
 
 The return values of decoding are `Decoding::Result` values, which come in `Ok` and `Err` subclasses. These describe how the decoding either succeeded or failed. The `Ok` values contain the decoded result, while the `Err` values always contain a string error message. It is up to you, as a developer, to decide how to deal with unsuccessful decoding.
 
+When you would rather not handle failure explicitly, `decode!` returns the decoded value itself and raises `Decoding::UnwrapError` when decoding fails:
+
+```ruby
+Decoding.decode!(D.string, "foo") # => "foo"
+Decoding.decode!(D.field("name", D.string), { "name" => 123 })
+# raises Decoding::UnwrapError: Error at .name: expected String, got Integer
+```
+
 ### Error messages
 
 Decoders that reach into a value -- `field`, `at`, `array`, `index` and `hash` -- record where in the input the error occurred, so a failure deep inside a nested structure still tells you how to find it:

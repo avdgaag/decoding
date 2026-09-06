@@ -120,4 +120,18 @@ module Decoding
   # @param value [Object]
   # @return [Decoding::Result<a>]
   def decode(decoder, value) = decoder.call(value).map_err(&:to_s)
+
+  # Run a given `decoder` on the given input `value`, returning the decoded
+  # value or raising an error when decoding failed.
+  #
+  # @example
+  #   decode!(string, "foo") # => "foo"
+  #   decode!(string, 123) # raises Decoding::UnwrapError
+  # @overload decode!(decoder, value)
+  #   @param decoder [Decoding::Decoder<a>]
+  #   @param value [Object]
+  #   @raise [Decoding::UnwrapError] when decoding failed.
+  #   @return [Object]
+  # @see Decoding::Result#unwrap!
+  def decode!(...) = decode(...).unwrap!
 end
