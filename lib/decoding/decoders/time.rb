@@ -10,6 +10,10 @@ module Decoding
     # the `Time` method that parses it.
     TIME_FORMATS = %i[iso8601 xmlschema rfc2822 rfc822 httpdate parse].freeze
 
+    # The units {Decoding::Decoders.unix_time} can read a timestamp in, mapped
+    # to the number of them that make up a second.
+    UNIX_TIME_UNITS = { seconds: 1, milliseconds: 1000 }.freeze
+
     module_function
 
     # Decode a `Time` object, or a string describing a time in a given format.
@@ -50,6 +54,36 @@ module Decoding
       else
         raise ArgumentError, "expected a time format name or a strptime pattern, got #{format.inspect}"
       end
+    end
+
+    # Decode a unix timestamp, given as a number or as a string describing one.
+    #
+    # Timestamps are read as a number of seconds since the epoch unless another
+    # unit is given. Note that reading a timestamp in the wrong unit is not an
+    # error but a wildly different point in time, so a source that reports
+    # milliseconds has to say so.
+    #
+    # @example
+    #   decode(unix_time, 1_595_674_680) # => Decoding::Ok(2020-07-25 10:58:00 UTC)
+    #   decode(unix_time(:milliseconds), 1_595_674_680_123)
+    #   # => Decoding::Ok(2020-07-25 10:58:00.123 UTC)
+    # @param unit [Symbol] one of the keys of {UNIX_TIME_UNITS}.
+    # @raise [ArgumentError] when the unit is not a known one. This is raised
+    #   when the decoder is built, not when it is used.
+    # @return [Decoding::Decoder<Time>]
+    # @see Decoding::Decoders::MapErr
+    def unix_time(unit = :seconds)
+      raise ArgumentError, "unknown unit: #{unit.inspect}" unless UNIX_TIME_UNITS.key?(unit)
+
+      per_second = UNIX_TIME_UNITS.fetch(unit)
+      Decoders.map_err(
+        Decoders.any(
+          Decoders.match(::Time),
+          Decoders.map(
+            Decoders.any(Decoders.integer, Decoders.float, Decoders.parsed_integer, Decoders.parsed_float)
+          ) { ::Time.at(per_second == 1 ? _1 : _1 / Rational(per_second)) }
+        )
+      ) { |_message, value| "expected a unix timestamp, got #{value.inspect}" }
     end
 
     private_class_method :time_format

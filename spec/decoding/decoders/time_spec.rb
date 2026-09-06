@@ -48,6 +48,48 @@ module Decoding
       expect(msg).to eql('Error at .at: expected a time in iso8601 format, got "nope"')
     end
 
+    it "decodes a unix timestamp given as an integer" do
+      Decoding.decode(Decoders.unix_time, 1_595_674_680) => Decoding::Ok(time)
+      expect(time).to eql(Time.utc(2020, 7, 25, 10, 58, 0))
+    end
+
+    it "decodes a unix timestamp given as a string" do
+      Decoding.decode(Decoders.unix_time, "1595674680") => Decoding::Ok(time)
+      expect(time).to eql(Time.utc(2020, 7, 25, 10, 58, 0))
+    end
+
+    it "decodes a unix timestamp with a fractional number of seconds" do
+      Decoding.decode(Decoders.unix_time, "1595674680.5") => Decoding::Ok(time)
+      expect(time.usec).to be(500_000)
+    end
+
+    it "decodes a unix timestamp in milliseconds" do
+      Decoding.decode(Decoders.unix_time(:milliseconds), 1_595_674_680_123) => Decoding::Ok(time)
+      expect(time).to eql(Time.utc(2020, 7, 25, 10, 58, 0) + Rational(123, 1000))
+    end
+
+    it "passes through Time objects given a unix timestamp" do
+      time = Time.utc(2020, 1, 1)
+      Decoding.decode(Decoders.unix_time, time) => Decoding::Ok(result)
+      expect(result).to eql(time)
+    end
+
+    it "fails given something that is not a unix timestamp" do
+      Decoding.decode(Decoders.unix_time, "abc") => Decoding::Err(msg)
+      expect(msg).to eql(%(expected a unix timestamp, got "abc"))
+      Decoding.decode(Decoders.unix_time, nil) => Decoding::Err(other)
+      expect(other).to eql("expected a unix timestamp, got nil")
+    end
+
+    it "fails given a number that cannot be a point in time" do
+      Decoding.decode(Decoders.unix_time, Float::NAN) => Decoding::Err(msg)
+      expect(msg).to eql("expected a unix timestamp, got NaN")
+    end
+
+    it "refuses an unknown unit" do
+      expect { Decoders.unix_time(:furlongs) }.to raise_error(ArgumentError, /unknown unit: :furlongs/)
+    end
+
     it "refuses an unknown format name" do
       expect { Decoders.time(:bogus) }.to raise_error(ArgumentError, /unknown time format: :bogus/)
     end

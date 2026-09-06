@@ -9,6 +9,7 @@
 * Add `optional_field` decoder for a key that may be absent from a hash
 * Add `time` and `date` decoders, available after `require "decoding/decoders/time"` and `require "decoding/decoders/date"`
 * Add `big_decimal` decoder, available after `require "decoding/decoders/big_decimal"`
+* Add `unix_time` decoder for timestamps, alongside the `time` decoder
 * Add `parsed_integer`, `parsed_float` and `parsed_boolean` decoders for reading typed values out of strings
 * Add `Decoding.env` for decoding a single environment variable, available after `require "decoding/env"`
 * Raise `Decoding::UnwrapError` as a `Decoding::Error`

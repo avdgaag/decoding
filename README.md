@@ -84,6 +84,8 @@ You can use the base decoders along with `map` to write more complex decoder. Fo
 time_decoder = D.map(D.string) { Time.at(_1.to_i) }
 ```
 
+(For unix timestamps specifically there is a `unix_time` decoder, described under optional decoders below; the point here is that `map` lets you build one yourself.)
+
 When the shape of the incoming data is unknown, you can try out various decoders in a row to find the first that succeeds using `any`:
 
 ```ruby
@@ -256,7 +258,15 @@ Decoding.decode(D.date("%Y|%m"), "2020|01") # => Decoding::Ok(#<Date: 2020-01-01
 Decoding.decode(D.date(:iso8601), "3rd Feb") # => Decoding::Err("expected a date in iso8601 format, got \"3rd Feb\"")
 ```
 
-`time` accepts `:iso8601`, `:xmlschema`, `:rfc2822`, `:rfc822`, `:httpdate` and `:parse`; `date` also accepts `:rfc3339` and `:jisx0301`. There is deliberately no default: `:parse` is lenient and fills in whatever the input leaves out from the current time, so it has to be asked for by name.
+`time` accepts `:iso8601`, `:xmlschema`, `:rfc2822`, `:rfc822`, `:httpdate` and `:parse`; `date` also accepts `:rfc3339` and `:jisx0301`. The same file provides `unix_time`, which reads a number, or a string describing one, as a number of seconds since the epoch:
+
+```ruby
+Decoding.decode(D.unix_time, 1_595_674_680) # => Decoding::Ok(2020-07-25 10:58:00 UTC)
+Decoding.decode(D.unix_time, "1595674680") # => Decoding::Ok(2020-07-25 10:58:00 UTC)
+Decoding.decode(D.unix_time(:milliseconds), 1_595_674_680_123) # => Decoding::Ok(2020-07-25 10:58:00.123 UTC)
+```
+
+A timestamp read in the wrong unit is not an error but a wildly different point in time, so a source reporting milliseconds has to say so. There is deliberately no default: `:parse` is lenient and fills in whatever the input leaves out from the current time, so it has to be asked for by name.
 
 * `big_decimal` -- decode a `BigDecimal` object, or a number or string describing one. Only finite numbers are accepted:
 
