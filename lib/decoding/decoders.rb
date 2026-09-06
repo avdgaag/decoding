@@ -5,6 +5,7 @@ require_relative "decoders/map"
 require_relative "decoders/map_err"
 require_relative "decoders/optional"
 require_relative "decoders/lazy"
+require_relative "decoders/enum"
 require_relative "decoders/any"
 require_relative "decoders/field"
 require_relative "decoders/array"
@@ -44,6 +45,25 @@ module Decoding
     # @return [Decoding::Decoder<Object>]
     # @see Decoding::Decoders::Match
     def match(pattern) = Decoders::Match.new(pattern)
+
+    # Decode a value that must be one of a fixed set of values.
+    #
+    # The values are compared for equality, and can be given either as separate
+    # arguments or as a single array.
+    #
+    # @example
+    #   decode(enum("active", "archived"), "active") # => Decoding::Ok("active")
+    #   decode(enum("active", "archived"), "nope")
+    #   # => Decoding::Err(%(expected one of "active", "archived", got "nope"))
+    # @overload enum(value, *values)
+    #   @param value [Object]
+    #   @param values [Object]
+    # @overload enum(values)
+    #   @param values [Array<Object>]
+    # @raise [ArgumentError] when no values are given, or one is repeated.
+    # @return [Decoding::Decoder<Object>]
+    # @see Decoding::Decoders::Enum
+    def enum(...) = Decoders::Enum.new(...)
 
     # Decode any string value that matches a regular expression.
     #
@@ -151,7 +171,7 @@ module Decoding
     #   decode(parsed_boolean, "1") # => Decoding::Err(%(expected "true" or "false", got "1"))
     # @return [Decoding::Decoder<Boolean>]
     def parsed_boolean
-      map_err(map(any(match("true"), match("false"))) { _1 == "true" }) do |_message, value|
+      map_err(map(enum("true", "false")) { _1 == "true" }) do |_message, value|
         %(expected "true" or "false", got #{value.inspect})
       end
     end

@@ -149,6 +149,12 @@ module Decoding
       expect(decode(match(Symbol), "foo")).to eql(Result.err("expected Symbol, got String"))
     end
 
+    it "decodes one of a fixed set of values" do
+      expect(decode(enum("active", "archived"), "active")).to eql(Result.ok("active"))
+      expect(decode(enum(%w[active archived]), "nope"))
+        .to eql(Result.err(%(expected one of "active", "archived", got "nope")))
+    end
+
     it "parses an integer out of a string" do
       expect(decode(parsed_integer, "8080")).to eql(Result.ok(8080))
       expect(decode(parsed_integer, "08")).to eql(Result.ok(8))

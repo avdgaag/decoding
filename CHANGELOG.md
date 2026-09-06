@@ -5,6 +5,7 @@
 * Add `Decoding.decode!` for decoding a value, raising `Decoding::UnwrapError` when decoding fails
 * Add `lazy` decoder, making recursive decoders possible
 * Add `match` decoder for matching a value against any pattern using `===`
+* Add `enum` decoder for a value that must be one of a fixed set of values
 * Add `time` and `date` decoders, available after `require "decoding/decoders/time"` and `require "decoding/decoders/date"`
 * Add `parsed_integer`, `parsed_float` and `parsed_boolean` decoders for reading typed values out of strings
 * Add `Decoding.env` for decoding a single environment variable, available after `require "decoding/env"`

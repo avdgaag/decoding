@@ -202,6 +202,7 @@ The following decoders are included:
     * `parsed_boolean`
     * `regexp`
     * `match`
+    * `enum`
 * Utility decoders
     * `succeed`
     * `fail`
