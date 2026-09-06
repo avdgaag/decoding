@@ -31,7 +31,7 @@ Assume the response body, parsed as JSON, results in a value like this:
   "orderID" => "7EBWXB5",
   "orderDate" => "1595674680",
   "estimatedDeliveryDate" => "1596365935",
-  "deliveryDate" => null,
+  "deliveryDate" => nil,
   "delayed" => false,
   "status" => {
     "orderPlaced" => true,
@@ -54,8 +54,8 @@ time_decoder = D.map(D.string) { Time.at(_1.to_i) }
 order_decoder = D.map(
   D.field("orderID", D.string),
   D.field("orderDate", time_decoder),
-  D.hash(D.string, D.boolean)
-) { Order.new(*args) }
+  D.field("status", D.hash(D.string, D.boolean))
+) { |*args| Order.new(*args) }
 
 Decoding.decode(order_decoder, body)
 # => Decoding::Ok(#<data Order
@@ -92,6 +92,17 @@ Decoding.decode(string_or_integer, 1) # => Decoding::Ok(1)
 Decoding.decode(string_or_integer, '1') # => Decoding::Ok('1')
 ```
 
+A value that might be absent is decoded with `optional`. It hands the value to the given decoder first, so that decoder can give `nil` a meaning of its own, and only falls back to `nil` when the decoder cannot handle it:
+
+```ruby
+optional_name = D.optional(D.string)
+Decoding.decode(optional_name, "John") # => Decoding::Ok("John")
+Decoding.decode(optional_name, nil) # => Decoding::Ok(nil)
+Decoding.decode(optional_name, 123) # => Decoding::Err("expected String, got Integer")
+```
+
+Note how the failure is the one reported by the given decoder: since you asked for an optional string, being told the value was not `nil` either adds nothing.
+
 You can also base one decoder on a previously decoded value. For example, a payload might contain a version number describing its format. Use `and_then` to decode one value and then construct a new decoder to run against the same input using that value:
 
 ```ruby
@@ -114,6 +125,41 @@ Decoding.decode(multiple_version_decoder, "version" => "2", "fullName" => "Paul"
 ```
 
 The return values of decoding are `Decoding::Result` values, which come in `Ok` and `Err` subclasses. These describe how the decoding either succeeded or failed. The `Ok` values contain the decoded result, while the `Err` values always contain a string error message. It is up to you, as a developer, to decide how to deal with unsuccessful decoding.
+
+### Error messages
+
+Decoders that reach into a value -- `field`, `at`, `array`, `index` and `hash` -- record where in the input the error occurred, so a failure deep inside a nested structure still tells you how to find it:
+
+```ruby
+Decoding.decode(D.at("a", "b", D.string), { "a" => { "b" => 1 } })
+# => Decoding::Err("Error at .a.b: expected String, got Integer")
+```
+
+A decoder composed of other decoders reports the failures of the decoders it is built from, which is not always what a caller needs to know:
+
+```ruby
+id = D.any(D.integer, D.map(D.string, &:to_i))
+Decoding.decode(id, true)
+# => Decoding::Err("None of the decoders matched:\n  - expected Integer, got TrueClass\n  - expected String, got TrueClass")
+```
+
+Use `map_err` to give such a decoder a single error message of its own. The block receives the original message and the value being decoded, and returns the message to use instead:
+
+```ruby
+id = D.map_err(D.any(D.integer, D.map(D.string, &:to_i))) do |_message, value|
+  "expected an ID, got #{value.inspect}"
+end
+
+Decoding.decode(id, true)
+# => Decoding::Err("expected an ID, got true")
+```
+
+Replacing the message does not discard where the error occurred, so a decoder built this way still composes:
+
+```ruby
+Decoding.decode(D.field("id", id), { "id" => true })
+# => Decoding::Err("Error at .id: expected an ID, got true")
+```
 
 ## Available decoders
 
@@ -156,8 +202,8 @@ Some decoders depend on parts of the standard library that not every application
 ```ruby
 require "decoding/decoders/uri"
 
-D.decode(D.uri, "https://example.com") # => Decoding::Ok(URI("https://example.com"))
-D.decode(D.uri, 123)                   # => Decoding::Err("expected a URI, got 123")
+Decoding.decode(D.uri, "https://example.com") # => Decoding::Ok(URI("https://example.com"))
+Decoding.decode(D.uri, 123) # => Decoding::Err("expected a URI, got 123")
 ```
 
 ## Development
