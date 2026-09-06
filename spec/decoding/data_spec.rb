@@ -9,8 +9,9 @@ module Decoding
     include Decoding
     include Decoders
 
+    let(:user_class) { Decoding::Data.define(id: field("id", integer)) }
+
     it "defines a new data class" do
-      user_class = Decoding::Data.define(id: field("id", integer))
       user = user_class.new(id: 1)
       expect(user.id).to be(1)
     end
@@ -26,15 +27,11 @@ module Decoding
     end
 
     it "can decode a value" do
-      user_class = Decoding::Data.define(id: field("id", integer))
-      Decoding.decode(user_class.decoder, { "id" => 123 }) => Decoding::Ok(user)
-      expect(user.id).to be(123)
+      expect(user_class.decoder).to decode_value({ "id" => 123 }).to(user_class.new(id: 123))
     end
 
     it "fails like a normal decoder" do
-      user_class = Decoding::Data.define(id: field("id", integer))
-      Decoding.decode(user_class.decoder, { "name" => "John" }) => Decoding::Err(msg)
-      expect(msg).to eql(%(expected Hash with key "id"))
+      expect(user_class.decoder).to decode_value({ "name" => "John" }).failing_with(%(expected Hash with key "id"))
     end
 
     it "assigning to a constant still works" do

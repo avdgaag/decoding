@@ -19,6 +19,12 @@ Ruby gem for decoding dynamic/external data into known structures. Functional-st
 - Test file: `spec/<module>/<class>_spec.rb`
 - Run with `COVERAGE=true bundle exec rspec`
 
+**Custom matchers** (defined in `spec/support/matchers/`, tested in `spec/matchers/`):
+- `expect(decoder).to decode_value(input).to(value)` - assert what a decoder decodes an input to
+- `expect(decoder).to decode_value(input).failing_with(msg).at(*path)` - assert how it fails, path outermost first
+- `expect(result).to succeed_with(value)` / `expect(result).to fail_with(msg).at(*path)` - assert on a `Result`
+- Expected values compare strictly (`eql?`) unless you pass a matcher, so `1` does not match `1.0`
+
 ## Architecture
 
 **Core concepts:**

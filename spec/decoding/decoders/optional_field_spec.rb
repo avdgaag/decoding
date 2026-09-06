@@ -8,34 +8,29 @@ module Decoding
   module Decoders
     RSpec.describe OptionalField do
       it "decodes the value at the given key" do
-        decoder = OptionalField.new("count", Decoders.integer)
-        expect(decoder.call({ "count" => 5 })).to eql(Result.ok(5))
+        expect(OptionalField.new("count", Decoders.integer)).to decode_value({ "count" => 5 }).to(5)
       end
 
       it "succeeds with nil when the key is absent" do
-        decoder = OptionalField.new("count", Decoders.integer)
-        expect(decoder.call({})).to eql(Result.ok(nil))
+        expect(OptionalField.new("count", Decoders.integer)).to decode_value({}).to(nil)
       end
 
       it "succeeds with the given default when the key is absent" do
-        decoder = OptionalField.new("count", Decoders.integer, default: 0)
-        expect(decoder.call({})).to eql(Result.ok(0))
+        expect(OptionalField.new("count", Decoders.integer, default: 0)).to decode_value({}).to(0)
       end
 
       it "fails when the key is present but its value cannot be decoded" do
-        decoder = OptionalField.new("count", Decoders.integer, default: 0)
-        expect(Decoding.decode(decoder, { "count" => "abc" }))
-          .to eql(Result.err("Error at .count: expected Integer, got String"))
+        expect(OptionalField.new("count", Decoders.integer, default: 0))
+          .to decode_value({ "count" => "abc" }).failing_with("expected Integer, got String").at("count")
       end
 
       it "fails when the value is not a hash" do
-        decoder = OptionalField.new("count", Decoders.integer)
-        expect(Decoding.decode(decoder, 42)).to eql(Result.err("expected Hash, got Integer"))
+        expect(OptionalField.new("count", Decoders.integer)).to decode_value(42).failing_with("expected Hash, got Integer")
       end
 
       it "decodes a nil value with the given decoder rather than using the default" do
-        decoder = OptionalField.new("count", Decoders.optional(Decoders.integer), default: 0)
-        expect(decoder.call({ "count" => nil })).to eql(Result.ok(nil))
+        expect(OptionalField.new("count", Decoders.optional(Decoders.integer), default: 0))
+          .to decode_value({ "count" => nil }).to(nil)
       end
 
       it "describes a record in which only some keys are required" do
@@ -43,9 +38,10 @@ module Decoding
           name: Decoders.field("name", Decoders.string),
           nickname: Decoders.optional_field("nickname", Decoders.string)
         )
-        expect(Decoding.decode(decoder, { "name" => "Ringo" })).to eql(Result.ok({ name: "Ringo", nickname: nil }))
-        expect(Decoding.decode(decoder, { "name" => "Ringo", "nickname" => 123 }))
-          .to eql(Result.err("Error at .nickname: expected String, got Integer"))
+        expect(decoder).to decode_value({ "name" => "Ringo" }).to({ name: "Ringo", nickname: nil })
+        expect(decoder)
+          .to decode_value({ "name" => "Ringo", "nickname" => 123 })
+          .failing_with("expected String, got Integer").at("nickname")
       end
     end
   end

@@ -8,32 +8,32 @@ module Decoding
   module Decoders
     RSpec.describe Enum do
       it "decodes a value that is one of the given values" do
-        expect(Enum.new("active", "archived").call("active")).to eql(Result.ok("active"))
+        expect(Enum.new("active", "archived")).to decode_value("active").to("active")
       end
 
       it "fails for a value that is not one of the given values" do
-        expect(Decoding.decode(Enum.new("active", "archived"), "nope"))
-          .to eql(Result.err(%(expected one of "active", "archived", got "nope")))
+        expect(Enum.new("active", "archived"))
+          .to decode_value("nope").failing_with(%(expected one of "active", "archived", got "nope"))
       end
 
       it "takes the given values from a single array" do
-        expect(Enum.new(%w[active archived]).call("archived")).to eql(Result.ok("archived"))
+        expect(Enum.new(%w[active archived])).to decode_value("archived").to("archived")
       end
 
       it "decodes values of any type" do
-        expect(Enum.new(:a, 1, nil).call(nil)).to eql(Result.ok(nil))
-        expect(Decoding.decode(Enum.new(:a, 1, nil), "a"))
-          .to eql(Result.err(%(expected one of :a, 1, nil, got "a")))
+        expect(Enum.new(:a, 1, nil)).to decode_value(nil).to(nil)
+        expect(Enum.new(:a, 1, nil)).to decode_value("a").failing_with(%(expected one of :a, 1, nil, got "a"))
       end
 
       it "compares values for equality rather than by pattern" do
-        expect(Decoding.decode(Enum.new(String), "foo")).to be_err
+        expect(Enum.new(String)).not_to decode_value("foo")
       end
 
       it "reports where in a nested structure the error occurred" do
         decoder = Decoders.field("status", Enum.new("active", "archived"))
-        expect(Decoding.decode(decoder, { "status" => "nope" }))
-          .to eql(Result.err(%(Error at .status: expected one of "active", "archived", got "nope")))
+        expect(decoder)
+          .to decode_value({ "status" => "nope" })
+          .failing_with(%(expected one of "active", "archived", got "nope")).at("status")
       end
 
       it "refuses duplicate values" do

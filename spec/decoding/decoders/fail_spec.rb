@@ -6,8 +6,8 @@ module Decoding
   module Decoders
     RSpec.describe Fail do
       it "always fails with the given message, ignoring input" do
-        expect(Decoding.decode(Fail.new("oh no"), "anything")).to eql(Result.err("oh no"))
-        expect(Decoding.decode(Fail.new("broken"), 42)).to eql(Result.err("broken"))
+        expect(Fail.new("oh no")).to decode_value("anything").failing_with("oh no")
+        expect(Fail.new("broken")).to decode_value(42).failing_with("broken")
       end
 
       it "supports the decoder protocol" do
@@ -17,7 +17,7 @@ module Decoding
 
       it "composes with other decoders" do
         decoder = Decoding::Decoders::Any.new(Fail.new("nope"), Decoding::Decoders::Match.new(String))
-        expect(Decoding.decode(decoder, "hello")).to eql(Result.ok("hello"))
+        expect(decoder).to decode_value("hello").to("hello")
       end
     end
   end

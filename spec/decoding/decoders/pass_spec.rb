@@ -6,7 +6,7 @@ module Decoding
   module Decoders
     RSpec.describe Pass do
       it "always succeeds with its input value" do
-        expect(Decoding.decode(Pass.new, "foo")).to eql(Result.ok("foo"))
+        expect(Pass.new).to decode_value("foo").to("foo")
       end
     end
   end

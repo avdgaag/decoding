@@ -8,28 +8,24 @@ module Decoding
   module Decoders
     RSpec.describe Optional do
       it "succeeds with the value decoded by the given decoder" do
-        decoder = Optional.new(Decoders.string)
-        expect(decoder.call("foo")).to eql(Result.ok("foo"))
+        expect(Optional.new(Decoders.string)).to decode_value("foo").to("foo")
       end
 
       it "succeeds with nil given a nil value" do
-        decoder = Optional.new(Decoders.string)
-        expect(decoder.call(nil)).to eql(Result.ok(nil))
+        expect(Optional.new(Decoders.string)).to decode_value(nil).to(nil)
       end
 
       it "lets the given decoder decode a nil value first" do
-        decoder = Optional.new(Decoders.succeed(5))
-        expect(decoder.call(nil)).to eql(Result.ok(5))
+        expect(Optional.new(Decoders.succeed(5))).to decode_value(nil).to(5)
       end
 
       it "reports the failure of the given decoder" do
-        decoder = Optional.new(Decoders.string)
-        expect(Decoding.decode(decoder, 123)).to eql(Result.err("expected String, got Integer"))
+        expect(Optional.new(Decoders.string)).to decode_value(123).failing_with("expected String, got Integer")
       end
 
       it "retains the path of a nested failure" do
-        decoder = Optional.new(Decoders.array(Decoders.integer))
-        expect(Decoding.decode(decoder, [1, "x"])).to eql(Result.err("Error at .1: expected Integer, got String"))
+        expect(Optional.new(Decoders.array(Decoders.integer)))
+          .to decode_value([1, "x"]).failing_with("expected Integer, got String").at(1)
       end
     end
   end

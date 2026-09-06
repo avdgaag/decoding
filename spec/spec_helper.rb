@@ -11,6 +11,8 @@ end
 
 require "decoding"
 
+Dir[File.expand_path("support/**/*.rb", __dir__)].each { require _1 }
+
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
   config.example_status_persistence_file_path = ".rspec_status"

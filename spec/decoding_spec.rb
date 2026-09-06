@@ -6,7 +6,7 @@ RSpec.describe Decoding do
   end
 
   it "decodes a value using the given decoder" do
-    expect(Decoding.decode(Decoding::Decoders.string, "foo")).to eql(Decoding::Result.ok("foo"))
+    expect(Decoding.decode(Decoding::Decoders.string, "foo")).to succeed_with("foo")
   end
 
   it "unwraps a successful decoding with decode!" do

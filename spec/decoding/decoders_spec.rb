@@ -8,120 +8,124 @@ module Decoding
     include Decoders
 
     it "uses the decode function to decode a value using the given decoder" do
-      expect(decode(string, "foo")).to eql(Result.ok("foo"))
+      expect(decode(string, "foo")).to succeed_with("foo")
     end
 
     it "matches string" do
-      expect(decode(string, "foo")).to eql(Result.ok("foo"))
-      expect(decode(string, 123)).to eql(Result.err("expected String, got Integer"))
+      expect(string).to decode_value("foo").to("foo")
+      expect(string).to decode_value(123).failing_with("expected String, got Integer")
     end
 
     it "matches integer" do
-      expect(decode(integer, 123)).to eql(Result.ok(123))
-      expect(decode(integer, 0.5)).to eql(Result.err("expected Integer, got Float"))
-      expect(decode(integer, nil)).to eql(Result.err("expected Integer, got NilClass"))
+      expect(integer).to decode_value(123).to(123)
+      expect(integer).to decode_value(0.5).failing_with("expected Integer, got Float")
+      expect(integer).to decode_value(nil).failing_with("expected Integer, got NilClass")
     end
 
     it "matches float" do
-      expect(decode(float, 123.0)).to eql(Result.ok(123.0))
-      expect(decode(float, 123)).to eql(Result.err("expected Float, got Integer"))
+      expect(float).to decode_value(123.0).to(123.0)
+      expect(float).to decode_value(123).failing_with("expected Float, got Integer")
     end
 
     it "matches numeric" do
-      expect(decode(numeric, 123.0)).to eql(Result.ok(123.0))
-      expect(decode(numeric, 123)).to eql(Result.ok(123))
-      expect(decode(numeric, nil)).to eql(Result.err("expected Numeric, got NilClass"))
+      expect(numeric).to decode_value(123.0).to(123.0)
+      expect(numeric).to decode_value(123).to(123)
+      expect(numeric).to decode_value(nil).failing_with("expected Numeric, got NilClass")
     end
 
     it "matches nil" do
-      expect(decode(self.nil, nil)).to eql(Result.ok(nil))
-      expect(decode(self.nil, 123)).to eql(Result.err("expected NilClass, got Integer"))
+      expect(self.nil).to decode_value(nil).to(nil)
+      expect(self.nil).to decode_value(123).failing_with("expected NilClass, got Integer")
     end
 
     it "matches true" do
-      expect(decode(self.true, true)).to eql(Result.ok(true))
-      expect(decode(self.true, false)).to eql(Result.err("expected TrueClass, got FalseClass"))
+      expect(self.true).to decode_value(true).to(true)
+      expect(self.true).to decode_value(false).failing_with("expected TrueClass, got FalseClass")
     end
 
     it "matches false" do
-      expect(decode(self.false, false)).to eql(Result.ok(false))
-      expect(decode(self.false, true)).to eql(Result.err("expected FalseClass, got TrueClass"))
+      expect(self.false).to decode_value(false).to(false)
+      expect(self.false).to decode_value(true).failing_with("expected FalseClass, got TrueClass")
     end
 
     it "succeeds with a static value" do
-      expect(decode(succeed(456), 123)).to eql(Result.ok(456))
+      expect(succeed(456)).to decode_value(123).to(456)
     end
 
     it "fails with a static value" do
-      expect(decode(fail("456"), 123)).to eql(Result.err("456"))
+      expect(fail("456")).to decode_value(123).failing_with("456")
     end
 
     it "transforms a successfully decoded value with a block" do
-      expect(decode(map(string, &:upcase), "foo")).to eql(Result.ok("FOO"))
-      expect(decode(map(string, &:upcase), 123)).to be_err
+      expect(map(string, &:upcase)).to decode_value("foo").to("FOO")
+      expect(map(string, &:upcase)).not_to decode_value(123)
     end
 
     it "replaces the error message of a failed decoding with a block" do
-      expect(decode(map_err(string) { "expected a name" }, "foo")).to eql(Result.ok("foo"))
-      expect(decode(map_err(string) { "expected a name" }, 123)).to eql(Result.err("expected a name"))
+      expect(map_err(string) { "expected a name" }).to decode_value("foo").to("foo")
+      expect(map_err(string) { "expected a name" }).to decode_value(123).failing_with("expected a name")
     end
 
     it "decoders a value using the first matching of many decoders" do
-      expect(decode(any(string, integer), 123)).to eql(Result.ok(123))
+      expect(any(string, integer)).to decode_value(123).to(123)
     end
 
     it "decodes any boolean value" do
-      expect(decode(boolean, true)).to eql(Result.ok(true))
-      expect(decode(boolean, false)).to eql(Result.ok(false))
-      expect(decode(boolean, "yes")).to eql(Result.err("expected true or false, got String"))
+      expect(boolean).to decode_value(true).to(true)
+      expect(boolean).to decode_value(false).to(false)
+      expect(boolean).to decode_value("yes").failing_with("expected true or false, got String")
     end
 
     it "decodes a value that may or may not be nil" do
-      expect(decode(optional(string), "foo")).to eql(Result.ok("foo"))
-      expect(decode(optional(string), nil)).to eql(Result.ok(nil))
+      expect(optional(string)).to decode_value("foo").to("foo")
+      expect(optional(string)).to decode_value(nil).to(nil)
     end
 
     it "decodes a field from a hash" do
-      expect(decode(field("id", integer), "id" => 123)).to eql(Result.ok(123))
-      expect(decode(field("other", integer), "id" => 123)).to eql(Result.err(%(expected Hash with key "other")))
-      expect(decode(field("id", string), "id" => 123)).to eql(Result.err("Error at .id: expected String, got Integer"))
-      expect(decode(field("id", integer), 123)).to eql(Result.err("expected Hash, got Integer"))
+      expect(field("id", integer)).to decode_value({ "id" => 123 }).to(123)
+      expect(field("other", integer)).to decode_value({ "id" => 123 }).failing_with(%(expected Hash with key "other"))
+      expect(field("id", string)).to decode_value({ "id" => 123 }).failing_with("expected String, got Integer").at("id")
+      expect(field("id", integer)).to decode_value(123).failing_with("expected Hash, got Integer")
     end
 
     it "decodes a field that may be absent from a hash" do
-      expect(decode(optional_field("count", integer, default: 0), {})).to eql(Result.ok(0))
-      expect(decode(optional_field("count", integer, default: 0), { "count" => "x" }))
-        .to eql(Result.err("Error at .count: expected Integer, got String"))
+      expect(optional_field("count", integer, default: 0)).to decode_value({}).to(0)
+      expect(optional_field("count", integer, default: 0))
+        .to decode_value({ "count" => "x" }).failing_with("expected Integer, got String").at("count")
     end
 
     it "decodes an array of values using a decoder" do
-      expect(decode(array(integer), [1, 2, 3])).to eql(Result.ok([1, 2, 3]))
-      expect(decode(array(integer), [1, "2", 3])).to eql(Result.err("Error at .1: expected Integer, got String"))
+      expect(array(integer)).to decode_value([1, 2, 3]).to([1, 2, 3])
+      expect(array(integer)).to decode_value([1, "2", 3]).failing_with("expected Integer, got String").at(1)
     end
 
     it "provides the path for a nested decoder" do
       decoder = array(field("a", array(field("b", integer))))
-      expect(decode(decoder, [{ "a" => [{ "b" => 1 }] }])).to eql(Result.ok([[1]]))
-      expect(decode(decoder, [{ "a" => [{ "b" => nil }] }])).to eql(Result.err("Error at .0.a.0.b: expected Integer, got NilClass"))
+      expect(decoder).to decode_value([{ "a" => [{ "b" => 1 }] }]).to([[1]])
+      expect(decoder)
+        .to decode_value([{ "a" => [{ "b" => nil }] }])
+        .failing_with("expected Integer, got NilClass").at(0, "a", 0, "b")
     end
 
     it "decodes a deeply nested data structure" do
       decoder = at("a", "b", "c", string)
-      expect(decode(decoder, { "a" => { "b" => { "c" => "1" } } })).to eql(Result.ok("1"))
-      expect(decode(decoder, { "a" => { "b" => { "c" => 1 } } })).to eql(Result.err("Error at .a.b.c: expected String, got Integer"))
-      expect(decode(decoder, 123)).to eql(Result.err("expected Hash, got Integer"))
+      expect(decoder).to decode_value({ "a" => { "b" => { "c" => "1" } } }).to("1")
+      expect(decoder)
+        .to decode_value({ "a" => { "b" => { "c" => 1 } } })
+        .failing_with("expected String, got Integer").at("a", "b", "c")
+      expect(decoder).to decode_value(123).failing_with("expected Hash, got Integer")
     end
 
     it "decodes an array element by index using a decoder" do
-      expect(decode(index(0, integer), [1, 2, 3])).to eql(Result.ok(1))
+      expect(index(0, integer)).to decode_value([1, 2, 3]).to(1)
     end
 
     it "decodes a hash using two decoders" do
-      expect(decode(hash(string, integer), { "john" => 1 })).to eql(Result.ok("john" => 1))
+      expect(hash(string, integer)).to decode_value({ "john" => 1 }).to({ "john" => 1 })
     end
 
     it "decodes a string to a symbol" do
-      expect(decode(symbol, "foo")).to eql(Result.ok(:foo))
+      expect(symbol).to decode_value("foo").to(:foo)
     end
 
     it "decodes in two steps" do
@@ -132,60 +136,58 @@ module Decoding
           field("fullName", string)
         end
       end
-      expect(decode(decoder,  "version" => 1, "name" => "john")).to eql(Result.ok("john"))
-      expect(decode(decoder,  "version" => 2, "fullName" => "john")).to eql(Result.ok("john"))
+      expect(decoder).to decode_value({ "version" => 1, "name" => "john" }).to("john")
+      expect(decoder).to decode_value({ "version" => 2, "fullName" => "john" }).to("john")
     end
 
     it "decodes multiple decoders into a hash" do
       decoder = decode_hash({ id: field("id", integer), name: field("name", string) })
-      expect(decode(decoder, "id" => 1, "name" => "John")).to eql(Result.ok(id: 1, name: "John"))
+      expect(decoder).to decode_value({ "id" => 1, "name" => "John" }).to({ id: 1, name: "John" })
     end
 
     it "decodes into an empty hash given no decoders" do
-      decoder = decode_hash({})
-      expect(decode(decoder, "id" => 1, "name" => "John")).to eql(Result.ok({}))
+      expect(decode_hash({})).to decode_value({ "id" => 1, "name" => "John" }).to({})
     end
 
     it "decodes values into themselves using original" do
-      expect(decode(original, [1, 2, 3])).to eql(Result.ok([1, 2, 3]))
+      expect(original).to decode_value([1, 2, 3]).to([1, 2, 3])
     end
 
     it "matches a value against any pattern" do
-      expect(decode(match(Symbol), :foo)).to eql(Result.ok(:foo))
-      expect(decode(match(Symbol), "foo")).to eql(Result.err("expected Symbol, got String"))
+      expect(match(Symbol)).to decode_value(:foo).to(:foo)
+      expect(match(Symbol)).to decode_value("foo").failing_with("expected Symbol, got String")
     end
 
     it "decodes one of a fixed set of values" do
-      expect(decode(enum("active", "archived"), "active")).to eql(Result.ok("active"))
-      expect(decode(enum(%w[active archived]), "nope"))
-        .to eql(Result.err(%(expected one of "active", "archived", got "nope")))
+      expect(enum("active", "archived")).to decode_value("active").to("active")
+      expect(enum(%w[active archived])).to decode_value("nope").failing_with(%(expected one of "active", "archived", got "nope"))
     end
 
     it "parses an integer out of a string" do
-      expect(decode(parsed_integer, "8080")).to eql(Result.ok(8080))
-      expect(decode(parsed_integer, "08")).to eql(Result.ok(8))
-      expect(decode(parsed_integer, "0x1f")).to eql(Result.err(%(expected an integer, got "0x1f")))
-      expect(decode(parsed_integer, 8080)).to eql(Result.err("expected an integer, got 8080"))
+      expect(parsed_integer).to decode_value("8080").to(8080)
+      expect(parsed_integer).to decode_value("08").to(8)
+      expect(parsed_integer).to decode_value("0x1f").failing_with(%(expected an integer, got "0x1f"))
+      expect(parsed_integer).to decode_value(8080).failing_with("expected an integer, got 8080")
     end
 
     it "parses a float out of a string" do
-      expect(decode(parsed_float, "1.5")).to eql(Result.ok(1.5))
-      expect(decode(parsed_float, "1e3")).to eql(Result.ok(1000.0))
-      expect(decode(parsed_float, "abc")).to eql(Result.err(%(expected a number, got "abc")))
+      expect(parsed_float).to decode_value("1.5").to(1.5)
+      expect(parsed_float).to decode_value("1e3").to(1000.0)
+      expect(parsed_float).to decode_value("abc").failing_with(%(expected a number, got "abc"))
     end
 
     it "parses a boolean out of a string" do
-      expect(decode(parsed_boolean, "true")).to eql(Result.ok(true))
-      expect(decode(parsed_boolean, "false")).to eql(Result.ok(false))
-      expect(decode(parsed_boolean, "1")).to eql(Result.err(%(expected "true" or "false", got "1")))
-      expect(decode(parsed_boolean, true)).to eql(Result.err(%(expected "true" or "false", got true)))
+      expect(parsed_boolean).to decode_value("true").to(true)
+      expect(parsed_boolean).to decode_value("false").to(false)
+      expect(parsed_boolean).to decode_value("1").failing_with(%(expected "true" or "false", got "1"))
+      expect(parsed_boolean).to decode_value(true).failing_with(%(expected "true" or "false", got true))
     end
 
     it "decodes values matching a regular expression" do
-      expect(decode(regexp(/o|a/), "foo")).to eql(Result.ok("foo"))
-      expect(decode(regexp("o|a"), "foo")).to eql(Result.ok("foo"))
-      expect(decode(regexp(/o|a/), "qux")).to eql(Result.err("expected value matching /o|a/, got \"qux\""))
-      expect(decode(regexp("o|a"), "qux")).to eql(Result.err("expected value matching /o|a/, got \"qux\""))
+      expect(regexp(/o|a/)).to decode_value("foo").to("foo")
+      expect(regexp("o|a")).to decode_value("foo").to("foo")
+      expect(regexp(/o|a/)).to decode_value("qux").failing_with(%(expected value matching /o|a/, got "qux"))
+      expect(regexp("o|a")).to decode_value("qux").failing_with(%(expected value matching /o|a/, got "qux"))
     end
   end
 end

@@ -53,3 +53,13 @@ RSpec/IdenticalEqualityAssertion:
 
 RSpec/ExampleLength:
   Enabled: false
+
+# The matcher specs deliberately pass literal values to `expect` to assert on
+# the messages the matchers themselves produce.
+RSpec/DescribeClass:
+  Exclude:
+    - spec/matchers/*_spec.rb
+
+RSpec/ExpectActual:
+  Exclude:
+    - spec/matchers/*_spec.rb

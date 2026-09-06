@@ -15,8 +15,7 @@ module Decoding
       end
 
       it "decodes using the decoder returned by the block" do
-        decoder = Lazy.new { Decoders.string }
-        expect(decoder.call("foo")).to eql(Result.ok("foo"))
+        expect(Lazy.new { Decoders.string }).to decode_value("foo").to("foo")
       end
 
       it "does not build the decoder before decoding a value" do
@@ -40,14 +39,12 @@ module Decoding
 
       it "decodes a recursive structure" do
         input = { "name" => "a", "children" => [{ "name" => "b", "children" => [] }] }
-        expect(Decoding.decode(tree_decoder, input))
-          .to eql(Result.ok({ name: "a", children: [{ name: "b", children: [] }] }))
+        expect(tree_decoder).to decode_value(input).to({ name: "a", children: [{ name: "b", children: [] }] })
       end
 
       it "retains the path of a failure nested in a recursive structure" do
         input = { "name" => "a", "children" => [{ "name" => 1, "children" => [] }] }
-        expect(Decoding.decode(tree_decoder, input))
-          .to eql(Result.err("Error at .children.0.name: expected String, got Integer"))
+        expect(tree_decoder).to decode_value(input).failing_with("expected String, got Integer").at("children", 0, "name")
       end
     end
   end
