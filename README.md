@@ -240,6 +240,19 @@ Decoding.decode(D.uri, "https://example.com") # => Decoding::Ok(URI("https://exa
 Decoding.decode(D.uri, 123) # => Decoding::Err("expected a URI, got 123")
 ```
 
+* `time` and `date` -- decode a `Time` or `Date` object, or a string in a given format. The format is either the name of a standard format or a `strptime` pattern:
+
+```ruby
+require "decoding/decoders/time"
+require "decoding/decoders/date"
+
+Decoding.decode(D.time(:iso8601), "2020-01-01T10:00:00Z") # => Decoding::Ok(2020-01-01 10:00:00 UTC)
+Decoding.decode(D.date("%Y|%m"), "2020|01") # => Decoding::Ok(#<Date: 2020-01-01>)
+Decoding.decode(D.date(:iso8601), "3rd Feb") # => Decoding::Err("expected a date in iso8601 format, got \"3rd Feb\"")
+```
+
+`time` accepts `:iso8601`, `:xmlschema`, `:rfc2822`, `:rfc822`, `:httpdate` and `:parse`; `date` also accepts `:rfc3339` and `:jisx0301`. There is deliberately no default: `:parse` is lenient and fills in whatever the input leaves out from the current time, so it has to be asked for by name.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.

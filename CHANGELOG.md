@@ -5,7 +5,8 @@
 * Add `Decoding.decode!` for decoding a value, raising `Decoding::UnwrapError` when decoding fails
 * Add `lazy` decoder, making recursive decoders possible
 * Add `match` decoder for matching a value against any pattern using `===`
-* Raise `Decoding::UnwrapError` as a `Decoding::Error`, so all errors raised by this library share a base class
+* Add `time` and `date` decoders, available after `require "decoding/decoders/time"` and `require "decoding/decoders/date"`
+* Raise `Decoding::UnwrapError` as a `Decoding::Error`
 * Remove the unused `Decoding::Decoders::Index::Err` constant
 * Report the location of errors nested inside a `hash` decoder as a path, like `field` and `array` do, rather than flattening it into the error message.
 * Give the `boolean` decoder its own error message, rather than reporting the failures of the decoders it is built from
