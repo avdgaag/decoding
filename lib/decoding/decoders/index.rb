@@ -9,9 +9,6 @@ module Decoding
     #
     # @see Decoding::Decoders.index
     class Index < Decoder
-      # @private
-      Err = Result.err("error decoding array: index is out of bounds")
-
       # @param index [Integer]
       # @param decoder [Decoding::Decoder<Object>]
       def initialize(index, decoder)

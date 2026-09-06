@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
+require_relative "error"
+
 module Decoding
   # Raised when calling {Result#unwrap!} on an `Err` value.
-  class UnwrapError < StandardError; end
+  class UnwrapError < Error; end
 
   # A result represent the outcome of some computation that can succeed or fail.
   # The results are represented with two subclasses of `Result`: `Ok` and `Err`.

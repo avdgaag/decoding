@@ -217,6 +217,16 @@ The following decoders are included:
     * `hash`
     * `at`
 
+### A note on `include`
+
+Refer to the decoders through a short alias, as the examples above do:
+
+```ruby
+D = Decoding::Decoders
+```
+
+Do not `include Decoding::Decoders`. Several decoders are named after methods every object already has: `hash` would override `Object#hash`, leaving instances unusable as hash keys, and `fail` would shadow `Kernel#fail`, so raising an exception would silently build a decoder instead. In specs, `match` would shadow RSpec's `match` matcher. The decoders `nil`, `true` and `false` are unreachable as bare words in any case, since those are keywords.
+
 ### Optional decoders
 
 Some decoders depend on parts of the standard library that not every application needs, so they are not loaded by default. Require them explicitly to make them available:

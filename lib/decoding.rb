@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "decoding/version"
+require_relative "decoding/error"
 require_relative "decoding/decoders"
 require_relative "decoding/data"
 
@@ -110,8 +111,6 @@ require_relative "decoding/data"
 # always contain a string error message. It is up to you, as a developer, to
 # decide how to deal with unsuccessful decoding.
 module Decoding
-  class Error < StandardError; end
-
   module_function
 
   # Run a given `decoder` on the given input `value`.
