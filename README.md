@@ -258,6 +258,18 @@ Decoding.decode(D.date(:iso8601), "3rd Feb") # => Decoding::Err("expected a date
 
 `time` accepts `:iso8601`, `:xmlschema`, `:rfc2822`, `:rfc822`, `:httpdate` and `:parse`; `date` also accepts `:rfc3339` and `:jisx0301`. There is deliberately no default: `:parse` is lenient and fills in whatever the input leaves out from the current time, so it has to be asked for by name.
 
+* `big_decimal` -- decode a `BigDecimal` object, or a number or string describing one. Only finite numbers are accepted:
+
+```ruby
+require "decoding/decoders/big_decimal"
+
+Decoding.decode(D.big_decimal, "1.23") # => Decoding::Ok(BigDecimal("1.23"))
+Decoding.decode(D.big_decimal, 42) # => Decoding::Ok(BigDecimal("42"))
+Decoding.decode(D.big_decimal, "abc") # => Decoding::Err("expected a decimal number, got \"abc\"")
+```
+
+This decoder needs the `bigdecimal` gem, which is no longer one of Ruby's default gems. Add `gem "bigdecimal"` to your Gemfile to use it.
+
 ## Reading configuration from the environment
 
 Environment variables are always strings, and an application that is misconfigured should refuse to boot rather than fail later. `Decoding.env` reads a single variable, decodes it, and raises when it is missing or its value does not make sense:

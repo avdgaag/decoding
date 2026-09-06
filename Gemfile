@@ -14,6 +14,9 @@ gem "rubocop-rspec"
 gem "simplecov", "~> 1.2", require: false
 gem "yard", "~> 0.9.36"
 
+# Required for Ruby 3.4+ (removed from default gems)
+gem "bigdecimal"
+
 # Required for Ruby 4.0+ (removed from default gems)
 gem "irb"
 gem "logger"
