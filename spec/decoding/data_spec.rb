@@ -34,7 +34,7 @@ module Decoding
     it "fails like a normal decoder" do
       user_class = Decoding::Data.define(id: field("id", integer))
       Decoding.decode(user_class.decoder, { "name" => "John" }) => Decoding::Err(msg)
-      expect(msg).to eql("expected a Hash with key id")
+      expect(msg).to eql(%(expected Hash with key "id"))
     end
 
     it "assigning to a constant still works" do

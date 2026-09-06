@@ -19,7 +19,7 @@ module Decoding
 
       it "fails when given something other than an array" do
         decoder = Array.new(Decoders.integer)
-        expect(Decoding.decode(decoder, true)).to eql(Result.err("expected an Array, got: TrueClass"))
+        expect(Decoding.decode(decoder, true)).to eql(Result.err("expected Array, got TrueClass"))
       end
     end
   end

@@ -93,7 +93,7 @@ module Decoding
     #   decode(boolean, true) # => Decoding::Ok(true)
     #   decode(boolean, false) # => Decoding::Ok(false)
     # @return [Decoding::Decoder<Boolean>]
-    def boolean = any(self.true, self.false)
+    def boolean = map_err(any(self.true, self.false)) { |_msg, value| "expected true or false, got #{value.class}" }
 
     # Decode a String value into a symbol.
     #
@@ -292,7 +292,7 @@ module Decoding
     #   decode(decoder, { "a" => { "b" => { "c" => "d" } } })
     #   # => Decoding::Ok("d")
     #   decode(decoder, { "a" => { "b" => "d" } })
-    #   # => Decoding::Err("Error at .a.b: expected a Hash, got String")
+    #   # => Decoding::Err("Error at .a.b: expected Hash, got String")
     # @overload at(*fields, decoder)
     #   @param fields [String]
     #   @param decoder [Decoding::Decoder<a>]

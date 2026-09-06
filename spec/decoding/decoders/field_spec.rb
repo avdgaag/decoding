@@ -19,12 +19,12 @@ module Decoding
 
       it "fails when given a hash without the given key" do
         decoder = Field.new("name", Decoders.string)
-        expect(Decoding.decode(decoder, { "age" => 12 })).to eql(Result.err("expected a Hash with key name"))
+        expect(Decoding.decode(decoder, { "age" => 12 })).to eql(Result.err(%(expected Hash with key "name")))
       end
 
       it "fails when given something other than a hash" do
         decoder = Field.new("name", Decoders.string)
-        expect(Decoding.decode(decoder, nil)).to eql(Result.err("expected a Hash, got: nil"))
+        expect(Decoding.decode(decoder, nil)).to eql(Result.err("expected Hash, got NilClass"))
       end
     end
   end

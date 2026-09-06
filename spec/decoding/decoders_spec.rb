@@ -73,6 +73,7 @@ module Decoding
     it "decodes any boolean value" do
       expect(decode(boolean, true)).to eql(Result.ok(true))
       expect(decode(boolean, false)).to eql(Result.ok(false))
+      expect(decode(boolean, "yes")).to eql(Result.err("expected true or false, got String"))
     end
 
     it "decodes a value that may or may not be nil" do
@@ -82,9 +83,9 @@ module Decoding
 
     it "decodes a field from a hash" do
       expect(decode(field("id", integer), "id" => 123)).to eql(Result.ok(123))
-      expect(decode(field("other", integer), "id" => 123)).to eql(Result.err("expected a Hash with key other"))
+      expect(decode(field("other", integer), "id" => 123)).to eql(Result.err(%(expected Hash with key "other")))
       expect(decode(field("id", string), "id" => 123)).to eql(Result.err("Error at .id: expected String, got Integer"))
-      expect(decode(field("id", integer), 123)).to eql(Result.err("expected a Hash, got: 123"))
+      expect(decode(field("id", integer), 123)).to eql(Result.err("expected Hash, got Integer"))
     end
 
     it "decodes an array of values using a decoder" do
@@ -102,7 +103,7 @@ module Decoding
       decoder = at("a", "b", "c", string)
       expect(decode(decoder, { "a" => { "b" => { "c" => "1" } } })).to eql(Result.ok("1"))
       expect(decode(decoder, { "a" => { "b" => { "c" => 1 } } })).to eql(Result.err("Error at .a.b.c: expected String, got Integer"))
-      expect(decode(decoder, 123)).to eql(Result.err("expected a Hash, got: 123"))
+      expect(decode(decoder, 123)).to eql(Result.err("expected Hash, got Integer"))
     end
 
     it "decodes an array element by index using a decoder" do
@@ -146,8 +147,8 @@ module Decoding
     it "decodes values matching a regular expression" do
       expect(decode(regexp(/o|a/), "foo")).to eql(Result.ok("foo"))
       expect(decode(regexp("o|a"), "foo")).to eql(Result.ok("foo"))
-      expect(decode(regexp(/o|a/), "qux")).to eql(Result.err("expected value matching /o|a/, got: \"qux\""))
-      expect(decode(regexp("o|a"), "qux")).to eql(Result.err("expected value matching /o|a/, got: \"qux\""))
+      expect(decode(regexp(/o|a/), "qux")).to eql(Result.err("expected value matching /o|a/, got \"qux\""))
+      expect(decode(regexp("o|a"), "qux")).to eql(Result.err("expected value matching /o|a/, got \"qux\""))
     end
   end
 end

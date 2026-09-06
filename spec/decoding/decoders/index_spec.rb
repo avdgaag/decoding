@@ -24,7 +24,7 @@ module Decoding
 
       it "fails when given something other than an array" do
         index = Index.new(0, Decoders.integer)
-        expect(index.call(true)).to eql(Result.err(Failure.new("expected an Array, got: TrueClass")))
+        expect(index.call(true)).to eql(Result.err(Failure.new("expected Array, got TrueClass")))
       end
     end
   end

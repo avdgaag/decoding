@@ -21,7 +21,7 @@ module Decoding
         elsif @pattern.is_a?(Class)
           err(failure("expected #{@pattern}, got #{value.class}"))
         else
-          err(failure("expected value matching #{@pattern.inspect}, got: #{value.inspect}"))
+          err(failure("expected value matching #{@pattern.inspect}, got #{value.inspect}"))
         end
       end
     end
