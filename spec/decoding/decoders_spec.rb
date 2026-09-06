@@ -88,6 +88,12 @@ module Decoding
       expect(decode(field("id", integer), 123)).to eql(Result.err("expected Hash, got Integer"))
     end
 
+    it "decodes a field that may be absent from a hash" do
+      expect(decode(optional_field("count", integer, default: 0), {})).to eql(Result.ok(0))
+      expect(decode(optional_field("count", integer, default: 0), { "count" => "x" }))
+        .to eql(Result.err("Error at .count: expected Integer, got String"))
+    end
+
     it "decodes an array of values using a decoder" do
       expect(decode(array(integer), [1, 2, 3])).to eql(Result.ok([1, 2, 3]))
       expect(decode(array(integer), [1, "2", 3])).to eql(Result.err("Error at .1: expected Integer, got String"))

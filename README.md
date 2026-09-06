@@ -216,6 +216,7 @@ The following decoders are included:
     * `any`
     * `optional`
     * `field`
+    * `optional_field`
     * `array`
     * `index`
     * `hash`

@@ -8,6 +8,7 @@ require_relative "decoders/lazy"
 require_relative "decoders/enum"
 require_relative "decoders/any"
 require_relative "decoders/field"
+require_relative "decoders/optional_field"
 require_relative "decoders/array"
 require_relative "decoders/index"
 require_relative "decoders/hash"
@@ -285,6 +286,26 @@ module Decoding
     #   @return [Decoding::Decoder<a>]
     # @see Decoding::Decoders::Field
     def field(...) = Decoders::Field.new(...)
+
+    # Decode a value from a key that may be absent from a hash.
+    #
+    # When the key is absent, the given default is used. When it is present, its
+    # value must still decode: a key holding a value of the wrong type is an
+    # error rather than a reason to fall back to the default.
+    #
+    # @example
+    #   decoder = optional_field("count", integer, default: 0)
+    #   decode(decoder, {}) # => Decoding::Ok(0)
+    #   decode(decoder, { "count" => 5 }) # => Decoding::Ok(5)
+    #   decode(decoder, { "count" => "x" })
+    #   # => Decoding::Err("Error at .count: expected Integer, got String")
+    # @overload optional_field(key, decoder, default: nil)
+    #   @param key [Object]
+    #   @param decoder [Decoding::Decoder<a>]
+    #   @param default [Object]
+    #   @return [Decoding::Decoder<a>]
+    # @see Decoding::Decoders::OptionalField
+    def optional_field(...) = Decoders::OptionalField.new(...)
 
     # Decode an array of values using a given decoder.
     #
