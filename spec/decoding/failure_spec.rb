@@ -17,5 +17,15 @@ module Decoding
       failure = Failure.new("expected string").push("0").push("foo")
       expect(failure.to_s).to eql("Error at .foo.0: expected string")
     end
+
+    it "transforms the message" do
+      failure = Failure.new("expected string").map(&:upcase)
+      expect(failure.to_s).to eql("EXPECTED STRING")
+    end
+
+    it "retains the path when transforming the message" do
+      failure = Failure.new("expected string").push("0").push("foo").map { "expected integer" }
+      expect(failure.to_s).to eql("Error at .foo.0: expected integer")
+    end
   end
 end

@@ -130,11 +130,13 @@ The following decoders are included:
     * `boolean`
     * `symbol`
     * `regexp`
+    * `uri`
 * Utility decoders
     * `succeed`
     * `fail`
     * `original`
     * `map`
+    * `map_err`
     * `decode_hash`
     * `and_then`
 * Compound decoders

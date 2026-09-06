@@ -61,6 +61,11 @@ module Decoding
       expect(decode(map(string, &:upcase), 123)).to be_err
     end
 
+    it "replaces the error message of a failed decoding with a block" do
+      expect(decode(map_err(string) { "expected a name" }, "foo")).to eql(Result.ok("foo"))
+      expect(decode(map_err(string) { "expected a name" }, 123)).to eql(Result.err("expected a name"))
+    end
+
     it "decoders a value using the first matching of many decoders" do
       expect(decode(any(string, integer), 123)).to eql(Result.ok(123))
     end

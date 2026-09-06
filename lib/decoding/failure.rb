@@ -33,6 +33,18 @@ module Decoding
       self.class.new(@msg, @path + [segment])
     end
 
+    # Create a copy of this failure with a transformed error message, retaining
+    # the current stack of errors.
+    #
+    # This is useful for decoders that want to replace the error message of a
+    # nested decoder with something more fitting, without losing the location
+    # of the error.
+    #
+    # @yieldparam msg [String]
+    # @yieldreturn [String]
+    # @return [Decoding::Failure]
+    def map = self.class.new(yield(@msg), @path)
+
     def to_s
       if @path.any?
         "Error at .#{@path.reverse.join(".")}: #{@msg}"

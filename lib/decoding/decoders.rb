@@ -2,6 +2,7 @@
 
 require_relative "decoders/match"
 require_relative "decoders/map"
+require_relative "decoders/map_err"
 require_relative "decoders/any"
 require_relative "decoders/field"
 require_relative "decoders/array"
@@ -150,6 +151,28 @@ module Decoding
     #   @return [Decoding::Decoder<b>]
     # @see Decoding::Decoders::Map
     def map(...) = Decoders::Map.new(...)
+
+    # Decode a value with the given decoder and, if it failed, replace its
+    # error message with the result of the given block.
+    #
+    # This is useful for giving a compound decoder a single, fitting error
+    # message rather than exposing the messages of the decoders it is built
+    # from. The location of the original error, if any, is retained.
+    #
+    # @example
+    #   decoder = map_err(any(string, integer)) { |_msg, value|
+    #     "expected a string or integer, got #{value.inspect}"
+    #   }
+    #   decode(decoder, nil)
+    #   # => Decoding::Err("expected a string or integer, got nil")
+    # @overload map_err(decoder)
+    #   @param decoder [Decoding::Decoder<a>]
+    #   @yieldparam msg [String] the original error message
+    #   @yieldparam value [Object] the value being decoded
+    #   @yieldreturn [String]
+    #   @return [Decoding::Decoder<a>]
+    # @see Decoding::Decoders::MapErr
+    def map_err(...) = Decoders::MapErr.new(...)
 
     # Decode a value by trying many different decoders in order, using the first
     # matching result -- or a failure when none of the given decoders succeed.

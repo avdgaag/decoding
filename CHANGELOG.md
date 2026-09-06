@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+* Add `map_err` decoder for replacing the error message of a failed decoder
+
 ## [0.3.0]
 
 * Add `Decoding::Data` for creating decodable data classes
