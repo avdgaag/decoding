@@ -4,6 +4,7 @@ require_relative "decoders/match"
 require_relative "decoders/map"
 require_relative "decoders/map_err"
 require_relative "decoders/optional"
+require_relative "decoders/lazy"
 require_relative "decoders/any"
 require_relative "decoders/field"
 require_relative "decoders/array"
@@ -291,6 +292,26 @@ module Decoding
     #   @return [Decoding::Decoder<b>]
     # @see Decoding::Decoders::AndThen
     def and_then(...) = Decoders::AndThen.new(...)
+
+    # Create a decoder that is only built when it is used.
+    #
+    # This makes recursive decoders possible: without it, a decoder that refers
+    # to itself would recurse endlessly while being built.
+    #
+    # @example
+    #   def tree
+    #     decode_hash(
+    #       name: field("name", string),
+    #       children: field("children", array(lazy { tree }))
+    #     )
+    #   end
+    #   decode(tree, { "name" => "a", "children" => [] })
+    #   # => Decoding::Ok({ name: "a", children: [] })
+    # @overload lazy
+    #   @yieldreturn [Decoding::Decoder<a>]
+    #   @return [Decoding::Decoder<a>]
+    # @see Decoding::Decoders::Lazy
+    def lazy(...) = Decoders::Lazy.new(...)
 
     # Decode deeply-nested fields.
     #

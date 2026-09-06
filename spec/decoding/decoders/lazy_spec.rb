@@ -1,0 +1,54 @@
+# frozen_string_literal: true
+
+require_relative "../../../lib/decoding/decoders"
+require_relative "../../../lib/decoding/decoders/lazy"
+require_relative "../../../lib/decoding/result"
+
+module Decoding
+  module Decoders
+    RSpec.describe Lazy do
+      def tree_decoder
+        Decoders.decode_hash(
+          name: Decoders.field("name", Decoders.string),
+          children: Decoders.field("children", Decoders.array(Decoders.lazy { tree_decoder }))
+        )
+      end
+
+      it "decodes using the decoder returned by the block" do
+        decoder = Lazy.new { Decoders.string }
+        expect(decoder.call("foo")).to eql(Result.ok("foo"))
+      end
+
+      it "does not build the decoder before decoding a value" do
+        built = 0
+        decoder = Lazy.new do
+          built += 1
+          Decoders.string
+        end
+        expect { decoder.call("foo") }.to change { built }.from(0).to(1)
+      end
+
+      it "builds the decoder only once" do
+        built = 0
+        decoder = Lazy.new do
+          built += 1
+          Decoders.string
+        end
+        2.times { decoder.call("foo") }
+        expect(built).to be(1)
+      end
+
+      it "decodes a recursive structure" do
+        input = { "name" => "a", "children" => [{ "name" => "b", "children" => [] }] }
+        expect(Decoding.decode(tree_decoder, input))
+          .to eql(Result.ok({ name: "a", children: [{ name: "b", children: [] }] }))
+      end
+
+      it "retains the path of a failure nested in a recursive structure" do
+        input = { "name" => "a", "children" => [{ "name" => 1, "children" => [] }] }
+        expect(Decoding.decode(tree_decoder, input))
+          .to eql(Result.err("Error at .children.0.name: expected String, got Integer"))
+      end
+    end
+  end
+end

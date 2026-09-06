@@ -103,6 +103,20 @@ Decoding.decode(optional_name, 123) # => Decoding::Err("expected String, got Int
 
 Note how the failure is the one reported by the given decoder: since you asked for an optional string, being told the value was not `nil` either adds nothing.
 
+Decoders that refer to themselves need `lazy`, which defers building the decoder until there is a value to decode. Without it, building the decoder would recurse endlessly:
+
+```ruby
+def tree
+  D.decode_hash(
+    name: D.field("name", D.string),
+    children: D.field("children", D.array(D.lazy { tree }))
+  )
+end
+
+Decoding.decode(tree, { "name" => "a", "children" => [{ "name" => "b", "children" => [] }] })
+# => Decoding::Ok({ name: "a", children: [{ name: "b", children: [] }] })
+```
+
 You can also base one decoder on a previously decoded value. For example, a payload might contain a version number describing its format. Use `and_then` to decode one value and then construct a new decoder to run against the same input using that value:
 
 ```ruby
@@ -192,6 +206,7 @@ The following decoders are included:
     * `map_err`
     * `decode_hash`
     * `and_then`
+    * `lazy`
 * Compound decoders
     * `any`
     * `optional`
