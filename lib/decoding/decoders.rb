@@ -116,6 +116,46 @@ module Decoding
     # @return [Decoding::Decoder<Symbol>]
     def symbol = map(string, &:to_sym)
 
+    # @!group Parsing decoders
+
+    # Decode a string describing an integer into that integer.
+    #
+    # The string is always read as a decimal number, so `"08"` decodes to `8`
+    # and `"0x1f"` is not a valid integer.
+    #
+    # @example
+    #   decode(parsed_integer, "8080") # => Decoding::Ok(8080)
+    #   decode(parsed_integer, "abc") # => Decoding::Err(%(expected an integer, got "abc"))
+    # @return [Decoding::Decoder<Integer>]
+    def parsed_integer
+      map_err(map(string) { Integer(_1, 10) }) { |_message, value| "expected an integer, got #{value.inspect}" }
+    end
+
+    # Decode a string describing a number into a float.
+    #
+    # @example
+    #   decode(parsed_float, "1.5") # => Decoding::Ok(1.5)
+    #   decode(parsed_float, "abc") # => Decoding::Err(%(expected a number, got "abc"))
+    # @return [Decoding::Decoder<Float>]
+    def parsed_float
+      map_err(map(string) { Float(_1) }) { |_message, value| "expected a number, got #{value.inspect}" }
+    end
+
+    # Decode the string `"true"` or `"false"` into the matching boolean.
+    #
+    # Only those two values are accepted: anything else, such as `"1"` or
+    # `"yes"`, is an error rather than a guess at what was meant.
+    #
+    # @example
+    #   decode(parsed_boolean, "true") # => Decoding::Ok(true)
+    #   decode(parsed_boolean, "1") # => Decoding::Err(%(expected "true" or "false", got "1"))
+    # @return [Decoding::Decoder<Boolean>]
+    def parsed_boolean
+      map_err(map(any(match("true"), match("false"))) { _1 == "true" }) do |_message, value|
+        %(expected "true" or "false", got #{value.inspect})
+      end
+    end
+
     # @!group Utility decoders
 
     # A decoder that always succeeds with the given value.

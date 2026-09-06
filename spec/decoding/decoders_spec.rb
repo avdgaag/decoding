@@ -149,6 +149,26 @@ module Decoding
       expect(decode(match(Symbol), "foo")).to eql(Result.err("expected Symbol, got String"))
     end
 
+    it "parses an integer out of a string" do
+      expect(decode(parsed_integer, "8080")).to eql(Result.ok(8080))
+      expect(decode(parsed_integer, "08")).to eql(Result.ok(8))
+      expect(decode(parsed_integer, "0x1f")).to eql(Result.err(%(expected an integer, got "0x1f")))
+      expect(decode(parsed_integer, 8080)).to eql(Result.err("expected an integer, got 8080"))
+    end
+
+    it "parses a float out of a string" do
+      expect(decode(parsed_float, "1.5")).to eql(Result.ok(1.5))
+      expect(decode(parsed_float, "1e3")).to eql(Result.ok(1000.0))
+      expect(decode(parsed_float, "abc")).to eql(Result.err(%(expected a number, got "abc")))
+    end
+
+    it "parses a boolean out of a string" do
+      expect(decode(parsed_boolean, "true")).to eql(Result.ok(true))
+      expect(decode(parsed_boolean, "false")).to eql(Result.ok(false))
+      expect(decode(parsed_boolean, "1")).to eql(Result.err(%(expected "true" or "false", got "1")))
+      expect(decode(parsed_boolean, true)).to eql(Result.err(%(expected "true" or "false", got true)))
+    end
+
     it "decodes values matching a regular expression" do
       expect(decode(regexp(/o|a/), "foo")).to eql(Result.ok("foo"))
       expect(decode(regexp("o|a"), "foo")).to eql(Result.ok("foo"))

@@ -197,6 +197,9 @@ The following decoders are included:
     * `false`
     * `boolean`
     * `symbol`
+    * `parsed_integer`
+    * `parsed_float`
+    * `parsed_boolean`
     * `regexp`
     * `match`
 * Utility decoders
@@ -252,6 +255,42 @@ Decoding.decode(D.date(:iso8601), "3rd Feb") # => Decoding::Err("expected a date
 ```
 
 `time` accepts `:iso8601`, `:xmlschema`, `:rfc2822`, `:rfc822`, `:httpdate` and `:parse`; `date` also accepts `:rfc3339` and `:jisx0301`. There is deliberately no default: `:parse` is lenient and fills in whatever the input leaves out from the current time, so it has to be asked for by name.
+
+## Reading configuration from the environment
+
+Environment variables are always strings, and an application that is misconfigured should refuse to boot rather than fail later. `Decoding.env` reads a single variable, decodes it, and raises when it is missing or its value does not make sense:
+
+```ruby
+require "decoding/env"
+
+Decoding.env("DATABASE_URL")                  # => "postgres://localhost/app"
+Decoding.env("PORT", :integer)                # => 8080
+Decoding.env("DEBUG", :boolean)               # => true
+Decoding.env("PORT", :integer, default: 3000) # => 3000 when PORT is not set
+```
+
+The named types are `:string` (the default), `:symbol`, `:integer`, `:float` and `:boolean`. Any decoder is accepted too, which is how you read the types that live behind their own require:
+
+```ruby
+require "decoding/decoders/uri"
+
+Decoding.env("DATABASE_URL", D.uri) # => #<URI::Generic postgres://localhost/app>
+```
+
+Failures name the variable, so the reason an application would not start is clear:
+
+```
+Decoding::UnwrapError: ENV["PORT"] is not set
+Decoding::UnwrapError: ENV["PORT"]: expected an integer, got "abc"
+```
+
+A variable set to an empty string counts as set, so it still has to decode rather than quietly falling back to the default. To allow a variable to be absent without a default, give it a decoder that accepts `nil`:
+
+```ruby
+Decoding.env("SENTRY_DSN", D.optional(D.string)) # => nil when not set
+```
+
+Pass `from:` to read from somewhere other than `ENV`, which is useful in tests.
 
 ## Development
 
