@@ -26,11 +26,11 @@ module Decoding
             [
               @key_decoder
                 .call(k)
-                .map_err { |e| failure("error decoding key #{k.inspect}: #{e}") },
+                .map_err { _1.map { |msg| "invalid key: #{msg}" }.push(k) },
 
               @value_decoder
                 .call(v)
-                .map_err { |e| failure("error decoding value for key #{k.inspect}: #{e}") }
+                .map_err { _1.push(k) }
             ]
           )
         end
