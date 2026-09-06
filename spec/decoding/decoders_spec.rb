@@ -144,6 +144,11 @@ module Decoding
       expect(decode(original, [1, 2, 3])).to eql(Result.ok([1, 2, 3]))
     end
 
+    it "matches a value against any pattern" do
+      expect(decode(match(Symbol), :foo)).to eql(Result.ok(:foo))
+      expect(decode(match(Symbol), "foo")).to eql(Result.err("expected Symbol, got String"))
+    end
+
     it "decodes values matching a regular expression" do
       expect(decode(regexp(/o|a/), "foo")).to eql(Result.ok("foo"))
       expect(decode(regexp("o|a"), "foo")).to eql(Result.ok("foo"))

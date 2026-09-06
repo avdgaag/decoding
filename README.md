@@ -198,6 +198,7 @@ The following decoders are included:
     * `boolean`
     * `symbol`
     * `regexp`
+    * `match`
 * Utility decoders
     * `succeed`
     * `fail`

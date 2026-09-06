@@ -33,6 +33,18 @@ module Decoding
     # @see Decoding::Decoders::Match
     def string = Decoders::Match.new(String)
 
+    # Decode any value matching the given pattern, using the `===` operator.
+    # This works with anything that can be used in a `case` statement, such as
+    # classes, ranges and regular expressions.
+    #
+    # @example
+    #   decode(match(Symbol), :foo) # => Decoding::Ok(:foo)
+    #   decode(match(1..5), 3) # => Decoding::Ok(3)
+    # @param pattern [#===]
+    # @return [Decoding::Decoder<Object>]
+    # @see Decoding::Decoders::Match
+    def match(pattern) = Decoders::Match.new(pattern)
+
     # Decode any string value that matches a regular expression.
     #
     # @param regex [Regexp, String]

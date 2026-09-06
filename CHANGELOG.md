@@ -4,6 +4,7 @@
 * Add `map_err` decoder for replacing the error message of a failed decoder
 * Add `Decoding.decode!` for decoding a value, raising `Decoding::UnwrapError` when decoding fails
 * Add `lazy` decoder, making recursive decoders possible
+* Add `match` decoder for matching a value against any pattern using `===`
 * Report the location of errors nested inside a `hash` decoder as a path, like `field` and `array` do, rather than flattening it into the error message.
 * Give the `boolean` decoder its own error message, rather than reporting the failures of the decoders it is built from
 * Use consistent phrasing for the error messages of the `match`, `field`, `array` and `index` decoders
