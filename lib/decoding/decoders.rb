@@ -3,6 +3,7 @@
 require_relative "decoders/match"
 require_relative "decoders/map"
 require_relative "decoders/map_err"
+require_relative "decoders/optional"
 require_relative "decoders/any"
 require_relative "decoders/field"
 require_relative "decoders/array"
@@ -191,9 +192,15 @@ module Decoding
     # @example
     #   decode(string, "foo") # => Decoding::Ok("foo")
     #   decode(string, nil) # => Decoding::Ok(nil)
-    # @param decoder [Decoding::Decoder<a>]
-    # @return [Decoding::Decoder<a, nil>]
-    def optional(decoder) = any(decoder, self.nil)
+    # The given decoder gets to decode a `nil` value first, so it can give it a
+    # meaning of its own. Only when it fails to do so is `nil` treated as an
+    # absent value.
+    #
+    # @overload optional(decoder)
+    #   @param decoder [Decoding::Decoder<a>]
+    #   @return [Decoding::Decoder<a, nil>]
+    # @see Decoding::Decoders::Optional
+    def optional(...) = Decoders::Optional.new(...)
 
     # Decode a value from a given key in a hash.
     #

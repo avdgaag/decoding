@@ -31,7 +31,11 @@ module Decoding
 
           failures << result.unwrap_err(nil)
         end
-        err(failure("None of the decoders matched:\n#{failures.map { "  - #{_1}" }.join("\n")}"))
+        err(
+          failures.first.combine(failures.drop(1)) do |messages|
+            "None of the decoders matched:\n#{messages.map { "  - #{_1}" }.join("\n")}"
+          end
+        )
       end
     end
   end

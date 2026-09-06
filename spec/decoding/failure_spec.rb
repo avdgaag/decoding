@@ -27,5 +27,19 @@ module Decoding
       failure = Failure.new("expected string").push("0").push("foo").map { "expected integer" }
       expect(failure.to_s).to eql("Error at .foo.0: expected integer")
     end
+
+    it "combines failures that occurred at the same location, keeping that location" do
+      a = Failure.new("expected String").push("a")
+      b = Failure.new("expected Integer").push("a")
+      expect(a.combine([b]) { |messages| messages.join(" or ") }.to_s)
+        .to eql("Error at .a: expected String or expected Integer")
+    end
+
+    it "renders failures from different locations in full when combining them" do
+      a = Failure.new("expected String").push("a")
+      b = Failure.new("expected Integer").push("b")
+      expect(a.combine([b]) { |messages| messages.join(" or ") }.to_s)
+        .to eql("Error at .a: expected String or Error at .b: expected Integer")
+    end
   end
 end

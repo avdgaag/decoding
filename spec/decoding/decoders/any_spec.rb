@@ -28,6 +28,17 @@ module Decoding
           "- expected String, got TrueClass"
         )
       end
+
+      it "reports the location shared by all of its failures only once" do
+        any = Any.new(Decoders.field("a", Decoders.string), Decoders.field("a", Decoders.integer))
+        result = any.call({ "a" => true })
+        result => Err[failure]
+        expect(failure.to_s).to eql(
+          "Error at .a: None of the decoders matched:\n  " \
+          "- expected String, got TrueClass\n  " \
+          "- expected Integer, got TrueClass"
+        )
+      end
     end
   end
 end

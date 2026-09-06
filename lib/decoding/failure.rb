@@ -9,6 +9,17 @@ module Decoding
   # error, the `array` decoder can push `3` to the stack to indicate that
   # happened at index 3 in its input value.
   class Failure
+    # The error message, without the location it occurred at.
+    #
+    # @return [String]
+    attr_reader :msg
+
+    # The stack of segments describing where the error occurred, innermost
+    # first.
+    #
+    # @return [Array]
+    attr_reader :path
+
     # @param msg [String]
     # @param path [Array] Internal parameter for creating copies with updated paths
     def initialize(msg, path = [])
@@ -45,6 +56,25 @@ module Decoding
     # @return [Decoding::Failure]
     def map = self.class.new(yield(@msg), @path)
 
+    # Combine this failure with others into a single failure, using the given
+    # block to build a single message from all of their messages.
+    #
+    # When all failures occurred at the same location, that location is kept for
+    # the combined failure and left out of the individual messages, since the
+    # combined failure already describes it. Otherwise each message describes
+    # its own location.
+    #
+    # @param others [Array<Decoding::Failure>]
+    # @yieldparam messages [Array<String>]
+    # @yieldreturn [String]
+    # @return [Decoding::Failure]
+    def combine(others)
+      failures = [self, *others]
+      return self.class.new(yield(failures.map(&:to_s))) unless failures.map(&:path).uniq.size == 1
+
+      self.class.new(yield(failures.map(&:msg)), @path)
+    end
+
     def to_s
       if @path.any?
         "Error at .#{@path.reverse.join(".")}: #{@msg}"
@@ -52,9 +82,5 @@ module Decoding
         @msg
       end
     end
-
-    protected
-
-    attr_reader :msg, :path
   end
 end

@@ -5,6 +5,8 @@
 * Report the location of errors nested inside a `hash` decoder as a path, like `field` and `array` do, rather than flattening it into the error message.
 * Give the `boolean` decoder its own error message, rather than reporting the failures of the decoders it is built from
 * Use consistent phrasing for the error messages of the `match`, `field`, `array` and `index` decoders
+* Report the failure of the given decoder from the `optional` decoder, rather than also reporting that the value was not `nil`
+* Report the location shared by all failures of an `any` decoder once, instead of repeating it in every collected message
 
 ## [0.3.0]
 
