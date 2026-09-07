@@ -65,13 +65,23 @@ RSpec.describe "decode_value matcher" do
       .to raise_error(RSpec::Expectations::ExpectationNotMetError, 'expected a decoder, got "foo"')
   end
 
+  it "fails when negated and given something other than a decoder" do
+    expect { expect("foo").not_to decode_value("foo") }
+      .to raise_error(RSpec::Expectations::ExpectationNotMetError, 'expected a decoder, got "foo"')
+  end
+
   it "fails when negated and the decoder decodes the given input" do
     expect { expect(string).not_to decode_value("foo") }
       .to raise_error(RSpec::Expectations::ExpectationNotMetError, 'expected the decoder not to decode "foo"')
   end
 
-  it "refuses to be negated when an outcome is expected" do
+  it "refuses to be negated when a value is expected" do
     expect { expect(string).not_to decode_value("foo").to("foo") }
+      .to raise_error(ArgumentError, "use `not_to decode_value(input)` without `to` or `failing_with`")
+  end
+
+  it "refuses to be negated when a failure is expected" do
+    expect { expect(string).not_to decode_value(123).failing_with("expected String, got Integer") }
       .to raise_error(ArgumentError, "use `not_to decode_value(input)` without `to` or `failing_with`")
   end
 end

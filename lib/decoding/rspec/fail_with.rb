@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "helpers"
+require_relative "matcher_helpers"
 
 # Passes when the given {Decoding::Result} is an `Err` that failed with the
 # expected message. Chain `at` to also assert where the failure occurred,
@@ -44,19 +44,5 @@ RSpec::Matchers.define :fail_with do |expected|
 
   description do
     "fail with #{description_of(expected)}#{render_path(expected_path)}"
-  end
-
-  def expected_path = @expected_path ||= []
-
-  def render_path(path) = path.empty? ? "" : " at .#{path.join(".")}"
-
-  # Split an error value into its message and the path it occurred at, with the
-  # outermost segment first.
-  def describe_failure(result)
-    error = result.unwrap_err(nil)
-    return [error.msg, error.path.reverse] if error.is_a?(Decoding::Failure)
-
-    match = error.to_s.match(/\AError at \.(?<path>.+?): (?<msg>.*)\z/m)
-    match ? [match[:msg], match[:path].split(".")] : [error.to_s, []]
   end
 end

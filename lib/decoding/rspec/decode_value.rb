@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "helpers"
+require_relative "matcher_helpers"
 
 # Passes when the given decoder decodes the given input. Chain `to` to also
 # assert the decoded value, or `failing_with` (optionally with `at`) to assert

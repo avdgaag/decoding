@@ -29,6 +29,8 @@ Metrics/AbcSize:
 Metrics/BlockLength:
   Exclude:
     - spec/**/*_spec.rb
+    # The RSpec matcher DSL puts a matcher's whole definition inside one block.
+    - lib/decoding/rspec/*.rb
 
 Metrics/MethodLength:
   Max: 17

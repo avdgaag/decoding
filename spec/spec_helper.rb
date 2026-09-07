@@ -10,8 +10,7 @@ if ENV["COVERAGE"]
 end
 
 require "decoding"
-
-Dir[File.expand_path("support/**/*.rb", __dir__)].each { require _1 }
+require "decoding/rspec"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

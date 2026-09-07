@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "helpers"
+require_relative "matcher_helpers"
 
 # Passes when the given {Decoding::Result} is an `Ok` holding the expected
 # value. The expected value may itself be a matcher.

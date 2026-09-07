@@ -334,6 +334,45 @@ Decoding.env("SENTRY_DSN", D.optional(D.string)) # => nil when not set
 
 Pass `from:` to read from somewhere other than `ENV`, which is useful in tests.
 
+## Testing your own decoders
+
+The matchers this gem tests itself with are available to applications that write decoders of their own. They need `rspec-expectations`, which is not a dependency of this gem, so require them from your spec helper:
+
+```ruby
+# spec/spec_helper.rb
+require "decoding/rspec"
+```
+
+`decode_value` describes a decoder, running it for you, so an example says what a decoder does rather than how to call it:
+
+```ruby
+expect(my_decoder).to decode_value({ "name" => "John" }).to({ name: "John" })
+expect(my_decoder).to decode_value({}).failing_with(%(expected Hash with key "name"))
+expect(my_decoder).to decode_value(nil)      # decodes; the value is not asserted
+expect(my_decoder).not_to decode_value(nil)  # fails to decode
+```
+
+An error nested in a structure is asserted with its location, outermost segment first, rather than by matching the rendered `Error at .` prefix:
+
+```ruby
+expect(D.field("a", D.field("b", D.string)))
+  .to decode_value({ "a" => { "b" => 1 } })
+  .failing_with("expected String, got Integer").at("a", "b")
+```
+
+`succeed_with` and `fail_with` describe a result you already have, for when making the call is part of what the example tests:
+
+```ruby
+expect(Decoding.decode(my_decoder, input)).to succeed_with({ name: "John" })
+expect(Decoding.decode(my_decoder, input)).to fail_with("expected String, got Integer").at("name")
+```
+
+Expected values are compared strictly, so `1` does not match `1.0` and a decoder answering with the wrong type cannot pass. Pass a matcher where that is too strict:
+
+```ruby
+expect(D.unix_time).to decode_value("1595674680.5").to(an_object_having_attributes(usec: 500_000))
+```
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
