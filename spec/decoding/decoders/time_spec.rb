@@ -5,6 +5,25 @@ require_relative "../../../lib/decoding/decoders/time"
 require_relative "../../../lib/decoding/result"
 
 module Decoding
+  # Stands in for an `ActiveSupport::TimeZone`: it answers the same handful of
+  # methods and resolves every time it parses at a fixed offset.
+  class FixedZone
+    def initialize(offset)
+      @offset = offset
+    end
+
+    def iso8601(str) = ::Time.iso8601(str).getlocal(@offset)
+    def parse(str) = ::Time.parse(str).getlocal(@offset)
+    def strptime(str, format) = ::Time.strptime(str, format).getlocal(@offset)
+    def at(number) = ::Time.at(number).getlocal(@offset)
+  end
+
+  # `ActiveSupport::TimeZone#parse` answers a value it cannot parse with nil
+  # rather than by raising, unlike every method of `Time`.
+  class NilParsingZone
+    def parse(_str) = nil
+  end
+
   RSpec.describe Decoders do
     it "parses a string in a named format" do
       expect(Decoders.time(:iso8601)).to decode_value("2020-01-01T10:00:00Z").to(Time.utc(2020, 1, 1, 10, 0, 0))
@@ -81,6 +100,46 @@ module Decoding
 
     it "refuses a format that is neither a name nor a pattern" do
       expect { Decoders.time(123) }.to raise_error(ArgumentError, /got 123/)
+    end
+
+    it "parses a string with the zone it is given" do
+      expect(Decoders.time(:iso8601, zone: FixedZone.new("+05:00")))
+        .to decode_value("2020-01-01T10:00:00Z").to(an_object_having_attributes(utc_offset: 18_000))
+    end
+
+    it "parses a strptime pattern with the zone it is given" do
+      expect(Decoders.time("%Y|%m", zone: FixedZone.new("+05:00")))
+        .to decode_value("2020|01").to(an_object_having_attributes(utc_offset: 18_000))
+    end
+
+    it "fails when the zone answers a value it cannot parse with nil" do
+      expect(Decoders.time(:parse, zone: NilParsingZone.new))
+        .to decode_value("nope").failing_with(%(expected a time, got "nope"))
+    end
+
+    it "refuses a zone that cannot parse the named format" do
+      expect { Decoders.time(:httpdate, zone: FixedZone.new("+00:00")) }
+        .to raise_error(ArgumentError, "cannot decode a time in httpdate format: the given zone does not respond to httpdate")
+    end
+
+    it "refuses a zone that cannot parse a strptime pattern" do
+      expect { Decoders.time("%Y|%m", zone: NilParsingZone.new) }
+        .to raise_error(ArgumentError, /cannot decode a time matching/)
+    end
+
+    it "reads a unix timestamp with the zone it is given" do
+      expect(Decoders.unix_time(zone: FixedZone.new("+05:00")))
+        .to decode_value(1_595_674_680).to(an_object_having_attributes(utc_offset: 18_000))
+    end
+
+    it "reads a millisecond timestamp with the zone it is given" do
+      expect(Decoders.unix_time(:milliseconds, zone: FixedZone.new("+05:00")))
+        .to decode_value(1_595_674_680_123).to(an_object_having_attributes(utc_offset: 18_000, usec: 123_000))
+    end
+
+    it "refuses a zone that cannot read a timestamp" do
+      expect { Decoders.unix_time(zone: NilParsingZone.new) }
+        .to raise_error(ArgumentError, /cannot decode a unix timestamp/)
     end
   end
 end

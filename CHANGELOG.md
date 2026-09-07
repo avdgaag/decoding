@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+* Add a `zone:` argument to the `time` and `unix_time` decoders, for resolving times somewhere other than the system's time zone. Anything answering the format you name will do, such as an `ActiveSupport::TimeZone`; a zone that cannot parse the format is refused when the decoder is built.
+* Treat a parser answering with `nil` as a failure to decode, rather than as a successfully decoded `nil`. `ActiveSupport::TimeZone#parse` does this where every method of `Time` raises.
+
 ## [0.4.0]
 
 * Add `uri` decoder for URI objects and strings that can be parsed as one, available after `require "decoding/decoders/uri"`

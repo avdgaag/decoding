@@ -268,6 +268,24 @@ Decoding.decode(D.unix_time(:milliseconds), 1_595_674_680_123) # => Decoding::Ok
 
 A timestamp read in the wrong unit is not an error but a wildly different point in time, so a source reporting milliseconds has to say so. There is deliberately no default: `:parse` is lenient and fills in whatever the input leaves out from the current time, so it has to be asked for by name.
 
+Both `time` and `unix_time` resolve times through `Time` itself, and so in the system's time zone. That is rarely the zone a Rails application means: its containers usually run UTC while the application runs somewhere else, and taking `to_date` of the two answers differs by a day for a late-evening timestamp. Pass anything that answers the format you name as `zone:` to decide it yourself:
+
+```ruby
+Decoding.decode(D.time(:parse, zone: Time.zone), "2020-01-01 10:00:00")
+# => Decoding::Ok(2020-01-01 10:00:00 +0100)
+Decoding.decode(D.map(D.unix_time(zone: Time.zone), &:to_date), 1_710_113_400)
+# => Decoding::Ok(#<Date: 2024-03-11>)
+```
+
+An `ActiveSupport::TimeZone` answers only `iso8601`, `rfc3339` and `parse` of the format names above, plus `strptime` patterns, so a zone that cannot parse the format you asked for is refused when the decoder is built:
+
+```ruby
+D.time(:httpdate, zone: Time.zone)
+# raises ArgumentError: cannot decode a time in httpdate format: the given zone does not respond to httpdate
+```
+
+Note `ActiveSupport::TimeZone#parse` answers a value it cannot parse with `nil` rather than by raising, unlike every method of `Time`. Both are read as a failure to decode.
+
 * `big_decimal` -- decode a `BigDecimal` object, or a number or string describing one. Only finite numbers are accepted:
 
 ```ruby
