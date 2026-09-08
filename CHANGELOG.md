@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [0.5.0]
+
 * Add a `zone:` argument to the `time` and `unix_time` decoders, for resolving times somewhere other than the system's time zone.
 * Add `decoding/rspec` module with matchers to help with testing custom decoders
 
