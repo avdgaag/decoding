@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "matcher_helpers"
+require_relative "../matcher_helpers"
 
 # Passes when the given {Decoding::Result} is an `Err` that failed with the
 # expected message. Chain `at` to also assert where the failure occurred,
@@ -12,7 +12,7 @@ require_relative "matcher_helpers"
 # Failures are recognised both as {Decoding::Failure} values and as the strings
 # they turn into once {Decoding.decode} has rendered them.
 RSpec::Matchers.define :fail_with do |expected|
-  include Decoding::SpecSupport::MatcherHelpers
+  include Decoding::MatcherHelpers
 
   match do |actual|
     next false unless actual.is_a?(Decoding::Result) && actual.err?

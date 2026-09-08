@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "matcher_helpers"
+require_relative "../matcher_helpers"
 
 # Passes when the given decoder decodes the given input. Chain `to` to also
 # assert the decoded value, or `failing_with` (optionally with `at`) to assert
@@ -11,7 +11,7 @@ require_relative "matcher_helpers"
 #     expect(decoder).to decode_value([1]).failing_with("expected String, got Integer").at(0)
 #     expect(decoder).not_to decode_value(true)
 RSpec::Matchers.define :decode_value do |input|
-  include Decoding::SpecSupport::MatcherHelpers
+  include Decoding::MatcherHelpers
 
   match do |actual|
     next false unless actual.respond_to?(:call)

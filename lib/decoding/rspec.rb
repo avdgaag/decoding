@@ -38,7 +38,7 @@
 #
 #     expect(unix_time).to decode_value("1595674680.5").to(an_object_having_attributes(usec: 500_000))
 require_relative "../decoding"
-require_relative "rspec/matcher_helpers"
+require_relative "matcher_helpers"
 require_relative "rspec/decode_value"
 require_relative "rspec/succeed_with"
 require_relative "rspec/fail_with"

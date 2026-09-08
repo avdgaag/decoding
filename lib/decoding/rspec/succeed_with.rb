@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require_relative "matcher_helpers"
+require_relative "../matcher_helpers"
 
 # Passes when the given {Decoding::Result} is an `Ok` holding the expected
 # value. The expected value may itself be a matcher.
 #
 #     expect(Decoding.decode(decoder, "foo")).to succeed_with("foo")
 RSpec::Matchers.define :succeed_with do |expected|
-  include Decoding::SpecSupport::MatcherHelpers
+  include Decoding::MatcherHelpers
 
   match do |actual|
     actual.is_a?(Decoding::Result) && actual.ok? && matches_value?(expected, actual.unwrap!)

@@ -1,8 +1,7 @@
 ## [Unreleased]
 
-* Add a `zone:` argument to the `time` and `unix_time` decoders, for resolving times somewhere other than the system's time zone. Anything answering the format you name will do, such as an `ActiveSupport::TimeZone`; a zone that cannot parse the format is refused when the decoder is built.
-* Treat a parser answering with `nil` as a failure to decode, rather than as a successfully decoded `nil`. `ActiveSupport::TimeZone#parse` does this where every method of `Time` raises.
-* Make the RSpec matchers this gem tests itself with available to applications, after `require "decoding/rspec"`
+* Add a `zone:` argument to the `time` and `unix_time` decoders, for resolving times somewhere other than the system's time zone.
+* Add `decoding/rspec` module with matchers to help with testing custom decoders
 
 ## [0.4.0]
 
