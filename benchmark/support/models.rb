@@ -13,6 +13,7 @@ module Benchmarks
     id: D.field("id", D.integer),
     name: D.field("name", D.string),
     email: D.field("email", D.regexp(/\A[^@\s]+@[^@\s]+\z/)),
+    phone: D.field("phone", D.optional(D.string)),
     vip: D.field("vip", D.boolean)
   )
 
@@ -27,6 +28,7 @@ module Benchmarks
     sku: D.field("sku", D.string),
     quantity: D.field("quantity", D.integer),
     unit_price: D.field("unit_price", D.big_decimal),
+    discount: D.field("discount", D.optional(D.big_decimal)),
     tags: D.field("tags", D.array(D.string))
   )
 
@@ -35,6 +37,8 @@ module Benchmarks
     reference: D.field("reference", D.regexp(/\AORD-\d{6}\z/)),
     status: D.field("status", D.map(D.enum(Fixture::STATUSES), &:to_sym)),
     placed_at: D.field("placed_at", D.time(:iso8601)),
+    shipped_at: D.field("shipped_at", D.optional(D.time(:iso8601))),
+    discount_code: D.field("discount_code", D.optional(D.string)),
     total: D.field("total", D.big_decimal),
     currency: D.field("currency", D.enum(Fixture::CURRENCIES)),
     gift: D.field("gift", D.boolean),
@@ -65,6 +69,8 @@ module Benchmarks
         reference: check(hash.fetch("reference"), /\AORD-\d{6}\z/),
         status: enum(hash.fetch("status"), Fixture::STATUSES).to_sym,
         placed_at: Time.iso8601(check(hash.fetch("placed_at"), String)),
+        shipped_at: hash.fetch("shipped_at")&.then { Time.iso8601(check(_1, String)) },
+        discount_code: check(hash.fetch("discount_code"), String, nil),
         total: decimal(hash.fetch("total")),
         currency: enum(hash.fetch("currency"), Fixture::CURRENCIES),
         gift: check(hash.fetch("gift"), true..true, false..false),
@@ -81,6 +87,7 @@ module Benchmarks
         id: check(hash.fetch("id"), Integer),
         name: check(hash.fetch("name"), String),
         email: check(hash.fetch("email"), /\A[^@\s]+@[^@\s]+\z/),
+        phone: check(hash.fetch("phone"), String, nil),
         vip: check(hash.fetch("vip"), true..true, false..false)
       )
     end
@@ -99,6 +106,7 @@ module Benchmarks
         sku: check(hash.fetch("sku"), String),
         quantity: check(hash.fetch("quantity"), Integer),
         unit_price: decimal(hash.fetch("unit_price")),
+        discount: hash.fetch("discount")&.then { decimal(_1) },
         tags: check(hash.fetch("tags"), Array).each { check(_1, String) }
       )
     end

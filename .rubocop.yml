@@ -37,6 +37,9 @@ Metrics/BlockLength:
 
 Metrics/MethodLength:
   Max: 17
+  Exclude:
+    # The benchmarks build test data in long methods.
+    - benchmark/support/*.rb
 
 Style/SignalException:
   Enabled: false

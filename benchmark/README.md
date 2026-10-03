@@ -10,19 +10,20 @@ bundle exec rake bench            # all of them
 bundle exec rake bench:realistic  # or one at a time
 ```
 
-| Script         | What it shows                                                                                                                       |
-| -------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `realistic.rb` | Throughput decoding a generated API response listing orders, next to `JSON.parse` and the same work done in plain Ruby.            |
-| `scaling.rb`   | Time per order as the document grows. If it rises with size, something is worse than linear.                                         |
-| `micro.rb`     | Individual decoders in isolation, including failing input, to find which one is responsible for a slowdown.                         |
-| `memory.rb`    | Objects allocated while decoding, compared with plain Ruby, and the lines in `lib/` that allocate most.                             |
+| Script         | What it shows                                                                                                                                        |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `realistic.rb` | Throughput decoding a generated API response listing orders, next to `JSON.parse` and the same work done in plain Ruby.                              |
+| `scaling.rb`   | Time per order as the document grows. If it rises with size, something is worse than linear.                                                         |
+| `invalid.rb`   | Documents with an error in the first order, the last order, or every order: time and allocations next to plain Ruby, which stops at the first error. |
+| `micro.rb`     | Individual decoders in isolation, including failing input, to find which one is responsible for a slowdown.                                          |
+| `memory.rb`    | Objects allocated while decoding, compared with plain Ruby, and the lines in `lib/` that allocate most.                                              |
 
 ## The test data
 
 `support/fixture.rb` generates the document from a fixed seed, so every run
 decodes the same data. Each order has nested objects, a list of order lines,
-a free-form hash, an optional field, booleans, enums, decimals and a
-timestamp, all as JSON would deliver them (string keys, and strings for
+a free-form hash, a key that may be absent, keys that are often `null`,
+booleans, enums, decimals and timestamps, all as JSON would deliver them (string keys, and strings for
 decimals and times). The document is parsed before timing starts, so only
 decoding is measured.
 

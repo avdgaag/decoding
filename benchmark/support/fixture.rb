@@ -35,11 +35,15 @@ module Benchmarks
 
     def order(id, random)
       lines = Array.new(random.rand(1..5)) { line(random) }
+      status = STATUSES.sample(random:)
+      placed_at = Time.utc(2026, 1, 1) + random.rand(0..(86_400 * 270))
       {
         "id" => id,
         "reference" => format("ORD-%06d", id),
-        "status" => STATUSES.sample(random:),
-        "placed_at" => Time.utc(2026, 1, 1).+(random.rand(0..(86_400 * 270))).iso8601,
+        "status" => status,
+        "placed_at" => placed_at.iso8601,
+        "shipped_at" => status == "shipped" ? (placed_at + random.rand(3_600..259_200)).iso8601 : nil,
+        "discount_code" => random.rand < 0.3 ? "SAVE#{random.rand(5..25)}" : nil,
         "total" => format("%.2f", lines.sum { _1["quantity"] * Float(_1["unit_price"]) }),
         "currency" => CURRENCIES.sample(random:),
         "gift" => random.rand < 0.1,
@@ -56,6 +60,7 @@ module Benchmarks
         "id" => id,
         "name" => "#{word(random).capitalize} #{word(random).capitalize}",
         "email" => "customer#{id}@example.com",
+        "phone" => random.rand < 0.5 ? format("+31 6 %08d", random.rand(10**8)) : nil,
         "vip" => random.rand < 0.2
       }
     end
@@ -74,10 +79,24 @@ module Benchmarks
         "sku" => format("SKU-%05d", random.rand(1..99_999)),
         "quantity" => random.rand(1..10),
         "unit_price" => format("%.2f", random.rand(1.0..250.0)),
+        "discount" => random.rand < 0.2 ? format("%.2f", random.rand(1.0..10.0)) : nil,
         "tags" => TAGS.sample(random.rand(0..3), random:)
       }
     end
 
     def word(random) = WORDS.sample(random:)
+
+    # A copy of a parsed document in which the orders at the given positions
+    # have a quantity that is not a number, on their last order line.
+    #
+    # @param document [Hash] as returned by {parsed}
+    # @param positions [Array<Integer>] indexes into the list of orders
+    # @return [Hash]
+    def invalidate(document, positions)
+      Marshal.load(Marshal.dump(document)).tap do |copy|
+        orders = copy.fetch("data").fetch("orders")
+        positions.each { orders.fetch(_1).fetch("lines").last["quantity"] = "lots" }
+      end
+    end
   end
 end

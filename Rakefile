@@ -13,7 +13,7 @@ YARD::Rake::YardocTask.new
 
 task default: %i[spec rubocop yard]
 
-BENCHMARKS = %w[realistic scaling micro memory].freeze
+BENCHMARKS = %w[realistic scaling invalid micro memory].freeze
 
 namespace :bench do
   BENCHMARKS.each do |name|
