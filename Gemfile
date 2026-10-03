@@ -22,3 +22,7 @@ gem "irb"
 gem "logger"
 gem "ostruct"
 gem "rdoc"
+
+# Benchmarks (see benchmark/README.md)
+gem "benchmark-ips", require: false
+gem "memory_profiler", require: false

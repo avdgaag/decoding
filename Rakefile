@@ -12,3 +12,15 @@ RuboCop::RakeTask.new
 YARD::Rake::YardocTask.new
 
 task default: %i[spec rubocop yard]
+
+BENCHMARKS = %w[realistic scaling micro memory].freeze
+
+namespace :bench do
+  BENCHMARKS.each do |name|
+    desc "Run benchmark/#{name}.rb"
+    task(name) { ruby "benchmark/#{name}.rb" }
+  end
+end
+
+desc "Run all benchmarks (see benchmark/README.md)"
+task bench: BENCHMARKS.map { "bench:#{_1}" }

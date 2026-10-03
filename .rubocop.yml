@@ -25,6 +25,9 @@ Metrics/ModuleLength:
 
 Metrics/AbcSize:
   Max: 18
+  Exclude:
+    # The benchmarks build test data in long methods.
+    - benchmark/support/*.rb
 
 Metrics/BlockLength:
   Exclude:
@@ -65,3 +68,13 @@ RSpec/DescribeClass:
 RSpec/ExpectActual:
   Exclude:
     - spec/matchers/*_spec.rb
+
+# The benchmarks print aligned tables, where plain format strings next to each
+# other read better than annotated ones.
+Style/FormatStringToken:
+  Exclude:
+    - benchmark/**/*.rb
+
+Style/RedundantFormat:
+  Exclude:
+    - benchmark/**/*.rb
