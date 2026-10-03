@@ -4,6 +4,7 @@
 * Decode valid input to `boolean`, `big_decimal`, `time`, `date`, `uri` and `unix_time` without first trying, and failing, a decoder for another type of input. Strings and numbers decode up to 3 times faster; values that are already a `Time`, `Date` or `URI` are now checked last and take a little longer.
 * Stop decoding an array, hash or `map` at the first failure, as only that one is reported. A document whose first record is invalid fails about 90 times faster. Items after the failure are no longer decoded, so blocks given to `map` for them no longer run.
 * Accept a block in `Result.all` to map each item to a result, stopping at the first `Err`
+* Make `optional` remember when its decoder has failed to decode `nil`, and decode `nil` without asking it again. A `nil` now takes about 0.3 µs instead of up to 5 µs. A decoder that does decode `nil`, such as `optional(succeed(5))`, is still asked every time.
 
 ## [0.5.0]
 

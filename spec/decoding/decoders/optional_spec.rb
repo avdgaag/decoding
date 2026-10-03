@@ -19,6 +19,33 @@ module Decoding
         expect(Optional.new(Decoders.succeed(5))).to decode_value(nil).to(5)
       end
 
+      it "stops asking the given decoder about nil once it has failed to decode it" do
+        seen = []
+        decoder = Optional.new(
+          Decoders.map(Decoders.original) do |value|
+            seen << value
+            Integer(value)
+          end
+        )
+        expect(decoder).to decode_value(nil).to(nil)
+        expect(decoder).to decode_value(nil).to(nil)
+        expect(decoder).to decode_value("1").to(1)
+        expect(seen).to eql([nil, "1"])
+      end
+
+      it "keeps asking the given decoder about nil when it decodes it" do
+        seen = []
+        decoder = Optional.new(
+          Decoders.map(Decoders.nil) do |value|
+            seen << value
+            5
+          end
+        )
+        expect(decoder).to decode_value(nil).to(5)
+        expect(decoder).to decode_value(nil).to(5)
+        expect(seen).to eql([nil, nil])
+      end
+
       it "reports the failure of the given decoder" do
         expect(Optional.new(Decoders.string)).to decode_value(123).failing_with("expected String, got Integer")
       end
