@@ -19,10 +19,7 @@ module Decoding
       # @return [Decoding::Result<a>]
       def call(value)
         if value.is_a?(::Array)
-          value
-            .each_with_index
-            .map { |v, i| @decoder.call(v).map_err { _1.push(i) } }
-            .then { all _1 }
+          all(value.each_index) { |i| @decoder.call(value[i]).map_err { _1.push(i) } }
         else
           err(failure("expected Array, got #{value.class}"))
         end

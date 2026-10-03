@@ -35,6 +35,16 @@ module Decoding
         expect(decoder).to decode_value(input).failing_with("expected Integer, got String").at("name")
       end
 
+      it "stops decoding at the first of multiple decoders that fails" do
+        seen = []
+        decoder = Map.new(
+          Decoders.field("name", Decoders.integer),
+          Decoders.map(Decoders.original) { seen << _1 }
+        ) { |name, _| name }
+        expect(decoder).to decode_value(input).failing_with("expected Integer, got String").at("name")
+        expect(seen).to be_empty
+      end
+
       it "handles errors in the map block" do
         failing_decoder = Map.new(Decoders.integer) do |_value|
           raise StandardError, "block error"

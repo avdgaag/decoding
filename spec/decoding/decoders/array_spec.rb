@@ -15,6 +15,18 @@ module Decoding
         expect(Array.new(Decoders.integer)).to decode_value(["foo"]).failing_with("expected Integer, got String").at(0)
       end
 
+      it "stops decoding items at the first one that fails" do
+        seen = []
+        decoder = Array.new(
+          Decoders.map(Decoders.original) do |item|
+            seen << item
+            Integer(item)
+          end
+        )
+        expect(decoder).to decode_value([1, "x", 3, "y"]).failing_with(start_with("error in map block")).at(1)
+        expect(seen).to eql([1, "x"])
+      end
+
       it "fails when given something other than an array" do
         expect(Array.new(Decoders.integer)).to decode_value(true).failing_with("expected Array, got TrueClass")
       end

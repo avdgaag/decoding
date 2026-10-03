@@ -92,6 +92,21 @@ module Decoding
       expect(Result.all([])).to eql(Result.ok([]))
     end
 
+    it "collapses items mapped to results with a block, stopping at the first error" do
+      seen = []
+      result = Result.all([1, 2, 3]) do |item|
+        seen << item
+        item == 2 ? Result.err("error") : Result.ok(item * 10)
+      end
+      expect(result).to eql(Result.err("error"))
+      expect(seen).to eql([1, 2])
+      expect(Result.all([1, 2]) { Result.ok(_1 * 10) }).to eql(Result.ok([10, 20]))
+    end
+
+    it "collapses the values of an enumerator that yields several at a time" do
+      expect(Result.all(%w[a b].each_with_index) { |item, index| Result.ok("#{item}#{index}") }).to eql(Result.ok(%w[a0 b1]))
+    end
+
     it "collapses an array of results into the first error, when there are several" do
       expect(Result.all([Result.ok(1), Result.err("first"), Result.ok(3), Result.err("second")])).to eql(Result.err("first"))
     end

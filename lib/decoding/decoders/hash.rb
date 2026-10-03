@@ -21,20 +21,20 @@ module Decoding
       def call(value)
         return err(failure("expected Hash, got #{value.class}")) unless value.is_a?(::Hash)
 
-        key_value_pairs = value.map do |k, v|
-          all(
-            [
-              @key_decoder
-                .call(k)
-                .map_err { _1.map { |msg| "invalid key: #{msg}" }.push(k) },
+        all(value) { |k, v| decode_entry(k, v) }.map(&:to_h)
+      end
 
-              @value_decoder
-                .call(v)
-                .map_err { _1.push(k) }
-            ]
-          )
-        end
-        all(key_value_pairs).map(&:to_h)
+      private
+
+      # Decode a single key and value into a pair, leaving the value alone
+      # when the key cannot be decoded.
+      def decode_entry(key, value)
+        @key_decoder
+          .call(key)
+          .map_err { _1.map { |msg| "invalid key: #{msg}" }.push(key) }
+          .and_then do |decoded_key|
+            @value_decoder.call(value).map_err { _1.push(key) }.map { [decoded_key, _1] }
+          end
       end
     end
   end

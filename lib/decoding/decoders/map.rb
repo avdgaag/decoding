@@ -22,7 +22,7 @@ module Decoding
       # @return [Decoding::Result<b>]
       def call(value)
         Result
-          .all(@decoders.map { _1.call(value) })
+          .all(@decoders) { _1.call(value) }
           .map { @block.call(*_1) }
       rescue StandardError => e
         err(failure("error in map block: #{e.message}"))

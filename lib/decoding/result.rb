@@ -30,17 +30,27 @@ module Decoding
     # Collapse array of result values into a single result, or return the
     # first `Err` value.
     #
+    # Given a block, each item is mapped to a result with the block first,
+    # one at a time, and items after the first `Err` are not mapped at all.
+    #
     # @example
     #   all(Ok(1), Ok(2)) # => Ok([1, 2])
     #   all(Ok(1), Err("error")) # => Err("error")
-    # @param results [Array<Result<a>>]
-    # @return [Result<a>]
-    def self.all(results)
-      values = results.map do |result|
-        result = result.to_result
+    #   all([1, 2]) { Ok(_1 * 10) } # => Ok([10, 20])
+    # @overload all(results)
+    #   @param results [Enumerable<Result<a>>]
+    # @overload all(items)
+    #   @param items [Enumerable<Object>]
+    #   @yieldparam item [Object]
+    #   @yieldreturn [Result<a>]
+    # @return [Result<Array<a>>]
+    def self.all(items)
+      values = []
+      items.each_entry do |item|
+        result = (block_given? ? yield(item) : item).to_result
         return result if result.err?
 
-        result.unwrap(nil)
+        values << result.unwrap(nil)
       end
       ok(values)
     end
