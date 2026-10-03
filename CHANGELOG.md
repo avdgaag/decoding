@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+* Decode arrays, hashes and multi-field decoders (such as `decode_hash` and `Decoding::Data`) in linear rather than quadratic time. Decoding 1,600 records is about 29 times faster.
+
 ## [0.5.0]
 
 * Add a `zone:` argument to the `time` and `unix_time` decoders, for resolving times somewhere other than the system's time zone.

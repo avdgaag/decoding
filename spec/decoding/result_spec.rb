@@ -14,6 +14,12 @@ module Decoding
       expect(Result.err(123)).to eql(Result.err(123))
     end
 
+    it "gives equal values the same hash, so they work as hash keys" do
+      expect(Result.ok([1, 2]).hash).to eql(Result.ok([1, 2]).hash)
+      expect(Result.ok(123).hash).not_to eql(Result.err(123).hash)
+      expect({ Result.ok(123) => true }).to have_key(Result.ok(123))
+    end
+
     it "ok and err values are not equal" do
       expect(Result.ok(123)).not_to eql(Result.err(123))
     end
@@ -84,6 +90,10 @@ module Decoding
       expect(Result.all([Result.ok(1), Result.ok(2)])).to eql(Result.ok([1, 2]))
       expect(Result.all([Result.ok(1), Result.err("error")])).to eql(Result.err("error"))
       expect(Result.all([])).to eql(Result.ok([]))
+    end
+
+    it "collapses an array of results into the first error, when there are several" do
+      expect(Result.all([Result.ok(1), Result.err("first"), Result.ok(3), Result.err("second")])).to eql(Result.err("first"))
     end
 
     it "transforms a value using a block producing a result" do

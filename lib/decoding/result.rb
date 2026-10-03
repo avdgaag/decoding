@@ -36,9 +36,13 @@ module Decoding
     # @param results [Array<Result<a>>]
     # @return [Result<a>]
     def self.all(results)
-      results.reduce(ok([])) do |acc, el|
-        acc.and(el.to_result) { [*_1, _2] }
+      values = results.map do |result|
+        result = result.to_result
+        return result if result.err?
+
+        result.unwrap(nil)
       end
+      ok(values)
     end
 
     private_class_method :new
@@ -48,12 +52,15 @@ module Decoding
 
     protected :value
 
+    # Computed when asked for rather than up front: results are rarely used as
+    # hash keys, and hashing a large decoded value for every result created
+    # made decoding a collection quadratic.
+    #
     # @private
-    attr_reader :hash
+    def hash = [self.class, value].hash
 
     def initialize(value)
       @value = value
-      @hash = [self.class, value].hash
       freeze
     end
 
