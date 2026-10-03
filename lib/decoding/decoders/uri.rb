@@ -18,8 +18,8 @@ module Decoding
     def uri
       Decoders.map_err(
         Decoders.any(
-          Decoders::Match.new(::URI::Generic),
-          Decoders.map(Decoders.string) { ::URI.parse(_1) }
+          Decoders.map(Decoders.string) { ::URI.parse(_1) },
+          Decoders::Match.new(::URI::Generic)
         )
       ) { |_msg, value| "expected a URI, got #{value.inspect}" }
     end

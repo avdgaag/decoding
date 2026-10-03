@@ -128,7 +128,7 @@ module Decoding
     #   decode(boolean, true) # => Decoding::Ok(true)
     #   decode(boolean, false) # => Decoding::Ok(false)
     # @return [Decoding::Decoder<Boolean>]
-    def boolean = map_err(any(self.true, self.false)) { |_msg, value| "expected true or false, got #{value.class}" }
+    def boolean = map_err(enum(true, false)) { |_msg, value| "expected true or false, got #{value.class}" }
 
     # Decode a String value into a symbol.
     #

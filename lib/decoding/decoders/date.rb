@@ -32,8 +32,8 @@ module Decoding
       parse, description = date_format(format)
       Decoders.map_err(
         Decoders.any(
-          Decoders.match(::Date),
-          Decoders.map(Decoders.string) { parse.call(_1) }
+          Decoders.map(Decoders.string) { parse.call(_1) },
+          Decoders.match(::Date)
         )
       ) { |_message, value| "expected #{description}, got #{value.inspect}" }
     end

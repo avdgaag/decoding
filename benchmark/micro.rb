@@ -9,6 +9,8 @@
 
 require "benchmark/ips"
 require_relative "support"
+require_relative "../lib/decoding/decoders/date"
+require_relative "../lib/decoding/decoders/uri"
 
 D = Benchmarks::D
 size = Benchmarks.size("SIZE", 100)
@@ -18,8 +20,13 @@ record = (1..20).to_h { ["field#{_1}", _1] }
 
 scenarios = {
   "integer" => [D.integer, 1],
-  "big_decimal" => [D.big_decimal, "12.34"],
+  "boolean (false)" => [D.boolean, false],
+  "big_decimal (string)" => [D.big_decimal, "12.34"],
+  "big_decimal (float)" => [D.big_decimal, 12.34],
   "time(:iso8601)" => [D.time(:iso8601), "2026-10-03T12:00:00Z"],
+  "unix_time (integer)" => [D.unix_time, 1_790_000_000],
+  "date(:iso8601)" => [D.date(:iso8601), "2026-10-03"],
+  "uri" => [D.uri, "https://example.com/orders?page=2"],
   "enum (4 values)" => [D.enum(Benchmarks::Fixture::STATUSES), "cancelled"],
   "any (5th of 5 matches)" => [D.any(D.nil, D.float, D.boolean, D.symbol, D.integer), 1],
   "field" => [D.field("field1", D.integer), record],

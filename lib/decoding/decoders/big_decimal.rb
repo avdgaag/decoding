@@ -6,6 +6,12 @@ module Decoding
   # Decoders are composable functions for deconstructing unknown input values
   # into known output values.
   module Decoders
+    # Matches the values {big_decimal} converts, in one check rather than
+    # trying a decoder for each type and discarding their failures.
+    DECIMAL_SOURCES = [::BigDecimal, ::Integer, ::Float, ::String].freeze
+    DECIMAL_SOURCE = ->(value) { DECIMAL_SOURCES.any? { _1 === value } }
+    private_constant :DECIMAL_SOURCES, :DECIMAL_SOURCE
+
     module_function
 
     # Decode a `BigDecimal` object, or a number or string describing one.
@@ -25,12 +31,9 @@ module Decoding
     # @see Decoding::Decoders::MapErr
     def big_decimal
       Decoders.map_err(
-        Decoders.and_then(
-          Decoders.any(
-            Decoders.match(::BigDecimal),
-            Decoders.map(Decoders.any(Decoders.integer, Decoders.float, Decoders.string)) { BigDecimal(_1) }
-          )
-        ) { |number| number.finite? ? Decoders.succeed(number) : Decoders.fail("not a finite number") }
+        Decoders.map(Decoders.match(DECIMAL_SOURCE)) do |value|
+          BigDecimal(value).tap { |number| raise ArgumentError, "not a finite number" unless number.finite? }
+        end
       ) { |_message, value| "expected a decimal number, got #{value.inspect}" }
     end
   end

@@ -10,6 +10,10 @@ module Decoding
     # the `Time` method that parses it.
     TIME_FORMATS = %i[iso8601 xmlschema rfc2822 rfc822 httpdate parse].freeze
 
+    # Matches the numbers {Decoding::Decoders.unix_time} reads as a timestamp.
+    TIMESTAMP_NUMBER = ->(value) { value.is_a?(::Integer) || value.is_a?(::Float) }
+    private_constant :TIMESTAMP_NUMBER
+
     # The units {Decoding::Decoders.unix_time} can read a timestamp in, mapped
     # to the number of them that make up a second.
     UNIX_TIME_UNITS = { seconds: 1, milliseconds: 1000 }.freeze
@@ -47,8 +51,8 @@ module Decoding
       parse, description = time_format(format, zone)
       Decoders.map_err(
         Decoders.any(
-          Decoders.match(::Time),
-          parsed_by(parse)
+          parsed_by(parse),
+          Decoders.match(::Time)
         )
       ) { |_message, value| "expected #{description}, got #{value.inspect}" }
     end
@@ -98,21 +102,23 @@ module Decoding
       raise ArgumentError, "unknown unit: #{unit.inspect}" unless UNIX_TIME_UNITS.key?(unit)
 
       require_parser(zone, :at, "a unix timestamp")
+      per_second = UNIX_TIME_UNITS.fetch(unit)
+      # Cheapest checks first, so the most common inputs fail the fewest
+      # decoders on their way to the one that matches.
       Decoders.map_err(
         Decoders.any(
+          timestamp_in(Decoders.match(TIMESTAMP_NUMBER), zone, per_second),
           Decoders.match(::Time),
-          timestamp_in(zone, UNIX_TIME_UNITS.fetch(unit))
+          timestamp_in(Decoders.any(Decoders.parsed_integer, Decoders.parsed_float), zone, per_second)
         )
       ) { |_message, value| "expected a unix timestamp, got #{value.inspect}" }
     end
 
-    # Decode a number, or a string describing one, as a point in time.
+    # Decode the number given by `decoder` as a point in time.
     #
     # @private
-    def timestamp_in(zone, per_second)
-      Decoders.map(
-        Decoders.any(Decoders.integer, Decoders.float, Decoders.parsed_integer, Decoders.parsed_float)
-      ) { zone.at(per_second == 1 ? _1 : _1 / Rational(per_second)) }
+    def timestamp_in(decoder, zone, per_second)
+      Decoders.map(decoder) { zone.at(per_second == 1 ? _1 : _1 / Rational(per_second)) }
     end
 
     # Decode a string with the given parser, treating a nil answer as a failure.
@@ -123,9 +129,7 @@ module Decoding
     #
     # @private
     def parsed_by(parse)
-      Decoders.and_then(Decoders.map(Decoders.string) { parse.call(_1) }) do |value|
-        value.nil? ? Decoders.fail("parsed to nothing") : Decoders.succeed(value)
-      end
+      Decoders.map(Decoders.string) { parse.call(_1) || raise(ArgumentError, "parsed to nothing") }
     end
 
     # Refuse a zone that cannot answer the parsing this decoder will ask of it,

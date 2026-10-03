@@ -1,6 +1,7 @@
 ## [Unreleased]
 
 * Decode arrays, hashes and multi-field decoders (such as `decode_hash` and `Decoding::Data`) in linear rather than quadratic time. Decoding 1,600 records is about 29 times faster.
+* Decode valid input to `boolean`, `big_decimal`, `time`, `date`, `uri` and `unix_time` without first trying, and failing, a decoder for another type of input. Strings and numbers decode up to 3 times faster; values that are already a `Time`, `Date` or `URI` are now checked last and take a little longer.
 
 ## [0.5.0]
 
