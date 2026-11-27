@@ -65,6 +65,15 @@ module Decoding
         expect(decoder).to decode_value("https://example.com ").failing_with(%(expected an http(s) URL, got "https://example.com "))
       end
 
+      it "fails given whitespace in the query, which the parser would escape rather than refuse" do
+        expect(decoder).to decode_value("https://example.com/?token=abc ")
+          .failing_with(%(expected an http(s) URL, got "https://example.com/?token=abc "))
+      end
+
+      it "fails given a string the parser would rewrite, such as an upper-case scheme" do
+        expect(decoder).not_to decode_value("HTTPS://example.com")
+      end
+
       it "fails given something other than a string or URI" do
         expect(decoder).to decode_value(nil).failing_with("expected an http(s) URL, got nil")
       end
