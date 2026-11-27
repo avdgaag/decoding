@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+* Add `http_url` decoder for an absolute http or https URL with a host, returned as a string, available after `require "decoding/decoders/uri"`
+
 ## [0.6.0]
 
 * Decode arrays, hashes and multi-field decoders (such as `decode_hash` and `Decoding::Data`) in linear rather than quadratic time. Decoding 1,600 records is about 29 times faster.

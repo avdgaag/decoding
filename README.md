@@ -247,6 +247,13 @@ Decoding.decode(D.uri, "https://example.com") # => Decoding::Ok(URI("https://exa
 Decoding.decode(D.uri, 123) # => Decoding::Err("expected a URI, got 123")
 ```
 
+The same file provides `http_url`, which is stricter: it accepts only an absolute `http` or `https` URL with a host, and returns it as a string. `uri` also accepts an empty string and a host without a scheme, so reach for `http_url` when a value has to be a working web address:
+
+```ruby
+Decoding.decode(D.http_url, "https://example.com") # => Decoding::Ok("https://example.com")
+Decoding.decode(D.http_url, "example.com") # => Decoding::Err("expected an http(s) URL, got \"example.com\"")
+```
+
 * `time` and `date` -- decode a `Time` or `Date` object, or a string in a given format. The format is either the name of a standard format or a `strptime` pattern:
 
 ```ruby
@@ -317,6 +324,7 @@ The named types are `:string` (the default), `:symbol`, `:integer`, `:float` and
 require "decoding/decoders/uri"
 
 Decoding.env("DATABASE_URL", D.uri) # => #<URI::Generic postgres://localhost/app>
+Decoding.env("API_URL", D.http_url) # => "https://api.example.com"
 ```
 
 Failures name the variable, so the reason an application would not start is clear:
