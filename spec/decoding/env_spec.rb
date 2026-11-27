@@ -34,9 +34,23 @@ module Decoding
         .to raise_error(Decoding::UnwrapError, 'ENV["PORT"] is not set')
     end
 
-    it "raises when the value cannot be decoded, naming the variable" do
+    it "raises when the value cannot be decoded, naming the variable but not its value" do
       expect { Decoding.env("PORT", :integer, from: { "PORT" => "abc" }) }
-        .to raise_error(Decoding::UnwrapError, 'ENV["PORT"]: expected an integer, got "abc"')
+        .to raise_error(Decoding::UnwrapError, 'ENV["PORT"]: expected an integer, got [REDACTED]')
+    end
+
+    it "keeps a secret in the value out of the error" do
+      value = "htps://user:s3cret@example.com/list?token=abc123"
+
+      expect { Decoding.env("LIST_URL", Decoders.http_url, from: { "LIST_URL" => value }) }
+        .to raise_error(Decoding::UnwrapError, 'ENV["LIST_URL"]: expected an http(s) URL, got [REDACTED]')
+    end
+
+    it "leaves out the message of a decoder that shows the value other than inspected" do
+      decoder = Decoders.and_then(Decoders.string) { |s| Decoders.fail("no idea what #{s} means") }
+
+      expect { Decoding.env("MODE", decoder, from: { "MODE" => "s3cret" }) }
+        .to raise_error(Decoding::UnwrapError, 'ENV["MODE"]: cannot be decoded; the value is not shown')
     end
 
     it "returns the default when the variable is not set" do

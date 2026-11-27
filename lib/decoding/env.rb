@@ -51,10 +51,26 @@ module Decoding
 
     decode!(
       Decoders.map_err(decoder) do |message, value|
-        value.nil? ? "ENV[#{name.inspect}] is not set" : "ENV[#{name.inspect}]: #{message}"
+        value.nil? ? "ENV[#{name.inspect}] is not set" : "ENV[#{name.inspect}]: #{redact_env_value(message, value)}"
       end,
       from.fetch(name, nil)
     )
+  end
+
+  # Takes the value out of a decoder's error message, as an environment
+  # variable can hold a secret (a password in a URL, a token in its query
+  # string) that would otherwise end up in the logs of an application that
+  # refused to start. Decoders show the value they reject inspected, so that is
+  # replaced; when the value is still in the message after that, the message is
+  # left out altogether. An empty value has nothing to hide and stays visible.
+  #
+  # @private
+  def redact_env_value(message, value)
+    raw = value.to_s
+    return message if raw.empty?
+
+    redacted = message.gsub(value.inspect, "[REDACTED]")
+    redacted.include?(raw) ? "cannot be decoded; the value is not shown" : redacted
   end
 
   # @private
@@ -66,5 +82,5 @@ module Decoding
     Decoders.public_send(ENV_TYPES.fetch(type))
   end
 
-  private_class_method :env_decoder
+  private_class_method :env_decoder, :redact_env_value
 end

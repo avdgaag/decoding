@@ -327,12 +327,14 @@ Decoding.env("DATABASE_URL", D.uri) # => #<URI::Generic postgres://localhost/app
 Decoding.env("API_URL", D.http_url) # => "https://api.example.com"
 ```
 
-Failures name the variable, so the reason an application would not start is clear:
+Failures name the variable, so the reason an application would not start is clear. They leave out the value, as a variable can hold a secret, such as a password in a URL or a token in its query string, that would otherwise end up in the logs:
 
 ```
 Decoding::UnwrapError: ENV["PORT"] is not set
-Decoding::UnwrapError: ENV["PORT"]: expected an integer, got "abc"
+Decoding::UnwrapError: ENV["PORT"]: expected an integer, got [REDACTED]
 ```
+
+The value is taken out where a decoder shows it inspected, as every decoder in this gem does. A decoder of your own that shows it some other way has its message left out altogether: `ENV["PORT"]: cannot be decoded; the value is not shown`. An empty value hides nothing and stays visible.
 
 A variable set to an empty string counts as set, so it still has to decode rather than quietly falling back to the default. To allow a variable to be absent without a default, give it a decoder that accepts `nil`:
 
