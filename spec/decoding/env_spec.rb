@@ -60,6 +60,20 @@ module Decoding
         .to raise_error(Decoding::UnwrapError, 'ENV["LIST_URL"]: cannot be decoded; the value is not shown')
     end
 
+    it "leaves out a message of the built-in form that shows the value in its description too" do
+      decoder = Decoders.and_then(Decoders.string) { |s| Decoders.fail("expected not #{s}, got #{s.inspect}") }
+
+      expect { Decoding.env("MODE", decoder, from: { "MODE" => "s3cret" }) }
+        .to raise_error(Decoding::UnwrapError, 'ENV["MODE"]: cannot be decoded; the value is not shown')
+    end
+
+    it "leaves out a message whose description shows the value escaped" do
+      decoder = Decoders.and_then(Decoders.string) { |s| Decoders.fail("expected not #{s.inspect[1..-2]}, got #{s.inspect}") }
+
+      expect { Decoding.env("MODE", decoder, from: { "MODE" => "s3\"cret" }) }
+        .to raise_error(Decoding::UnwrapError, 'ENV["MODE"]: cannot be decoded; the value is not shown')
+    end
+
     it "leaves out a message that names the value's class rather than the value" do
       expect { Decoding.env("DEBUG", Decoders.boolean, from: { "DEBUG" => "yes" }) }
         .to raise_error(Decoding::UnwrapError, 'ENV["DEBUG"]: cannot be decoded; the value is not shown')
