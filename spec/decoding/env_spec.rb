@@ -53,6 +53,18 @@ module Decoding
         .to raise_error(Decoding::UnwrapError, 'ENV["MODE"]: cannot be decoded; the value is not shown')
     end
 
+    it "leaves out the message of a decoder that shows only part of the value" do
+      decoder = Decoders.and_then(Decoders.string) { |s| Decoders.fail("unknown token #{s.split("=").last}") }
+
+      expect { Decoding.env("LIST_URL", decoder, from: { "LIST_URL" => "https://example.com/?token=s3cret" }) }
+        .to raise_error(Decoding::UnwrapError, 'ENV["LIST_URL"]: cannot be decoded; the value is not shown')
+    end
+
+    it "leaves out a message that names the value's class rather than the value" do
+      expect { Decoding.env("DEBUG", Decoders.boolean, from: { "DEBUG" => "yes" }) }
+        .to raise_error(Decoding::UnwrapError, 'ENV["DEBUG"]: cannot be decoded; the value is not shown')
+    end
+
     it "returns the default when the variable is not set" do
       expect(Decoding.env("PORT", :integer, default: 3000, from: {})).to be(3000)
     end

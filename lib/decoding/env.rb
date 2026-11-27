@@ -60,17 +60,22 @@ module Decoding
   # Takes the value out of a decoder's error message, as an environment
   # variable can hold a secret (a password in a URL, a token in its query
   # string) that would otherwise end up in the logs of an application that
-  # refused to start. Decoders show the value they reject inspected, so that is
-  # replaced; when the value is still in the message after that, the message is
-  # left out altogether. An empty value has nothing to hide and stays visible.
+  # refused to start.
+  #
+  # Only a message in the form the built-in decoders use, `expected ..., got`
+  # followed by the inspected value, keeps its description, with `[REDACTED]`
+  # in place of the value. Any other message is left out altogether, as there
+  # is no telling which part of the value it shows. An empty value has nothing
+  # to hide and stays visible.
   #
   # @private
   def redact_env_value(message, value)
-    raw = value.to_s
-    return message if raw.empty?
+    return message if value == ""
 
-    redacted = message.gsub(value.inspect, "[REDACTED]")
-    redacted.include?(raw) ? "cannot be decoded; the value is not shown" : redacted
+    shown = ", got #{value.inspect}"
+    return "cannot be decoded; the value is not shown" unless message.start_with?("expected ") && message.end_with?(shown)
+
+    "#{message.delete_suffix(shown)}, got [REDACTED]"
   end
 
   # @private

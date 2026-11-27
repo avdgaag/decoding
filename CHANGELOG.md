@@ -1,6 +1,6 @@
 ## [Unreleased]
 
-* Leave the value out of the error `Decoding.env` raises, as an environment variable can hold a secret. A message that shows the value inspected gets `[REDACTED]` in its place; any other message that contains the value is left out altogether
+* Leave the value out of the error `Decoding.env` raises, as an environment variable can hold a secret. A message in the form `expected ..., got <inspected value>` gets `[REDACTED]` in place of the value; any other message is left out altogether
 * Add `http_url` decoder for an absolute http or https URL with a host, returned as a string, available after `require "decoding/decoders/uri"`
 
 ## [0.6.0]
