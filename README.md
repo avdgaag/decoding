@@ -247,6 +247,13 @@ Decoding.decode(D.uri, "https://example.com") # => Decoding::Ok(URI("https://exa
 Decoding.decode(D.uri, 123) # => Decoding::Err("expected a URI, got 123")
 ```
 
+The same file provides `http_url`, which is stricter: it accepts only an absolute `http` or `https` URL with a host, and returns it as a string. `uri` also accepts an empty string and a host without a scheme, so reach for `http_url` when a value has to be a working web address:
+
+```ruby
+Decoding.decode(D.http_url, "https://example.com") # => Decoding::Ok("https://example.com")
+Decoding.decode(D.http_url, "example.com") # => Decoding::Err("expected an http(s) URL, got \"example.com\"")
+```
+
 * `time` and `date` -- decode a `Time` or `Date` object, or a string in a given format. The format is either the name of a standard format or a `strptime` pattern:
 
 ```ruby
@@ -317,14 +324,17 @@ The named types are `:string` (the default), `:symbol`, `:integer`, `:float` and
 require "decoding/decoders/uri"
 
 Decoding.env("DATABASE_URL", D.uri) # => #<URI::Generic postgres://localhost/app>
+Decoding.env("API_URL", D.http_url) # => "https://api.example.com"
 ```
 
-Failures name the variable, so the reason an application would not start is clear:
+Failures name the variable, so the reason an application would not start is clear. They leave out the value, as a variable can hold a secret, such as a password in a URL or a token in its query string, that would otherwise end up in the logs:
 
 ```
 Decoding::UnwrapError: ENV["PORT"] is not set
-Decoding::UnwrapError: ENV["PORT"]: expected an integer, got "abc"
+Decoding::UnwrapError: ENV["PORT"]: expected an integer, got [REDACTED]
 ```
+
+Only a message in the form the built-in decoders use, `expected ..., got` followed by the inspected value, keeps its description. Any other message is left out altogether, since there is no telling which part of the value it shows: `ENV["PORT"]: cannot be decoded; the value is not shown`. An empty value hides nothing and stays visible.
 
 A variable set to an empty string counts as set, so it still has to decode rather than quietly falling back to the default. To allow a variable to be absent without a default, give it a decoder that accepts `nil`:
 

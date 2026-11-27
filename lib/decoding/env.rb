@@ -51,10 +51,34 @@ module Decoding
 
     decode!(
       Decoders.map_err(decoder) do |message, value|
-        value.nil? ? "ENV[#{name.inspect}] is not set" : "ENV[#{name.inspect}]: #{message}"
+        value.nil? ? "ENV[#{name.inspect}] is not set" : "ENV[#{name.inspect}]: #{redact_env_value(message, value)}"
       end,
       from.fetch(name, nil)
     )
+  end
+
+  # Takes the value out of a decoder's error message, as an environment
+  # variable can hold a secret (a password in a URL, a token in its query
+  # string) that would otherwise end up in the logs of an application that
+  # refused to start.
+  #
+  # Only a message in the form the built-in decoders use, `expected ..., got`
+  # followed by the inspected value, keeps its description, with `[REDACTED]`
+  # in place of the value, and only when that description does not contain the
+  # value as well. Any other message is left out altogether, as there is no
+  # telling which part of the value it shows. An empty value has nothing to
+  # hide and stays visible.
+  #
+  # @private
+  def redact_env_value(message, value)
+    return message if value == ""
+
+    shown = ", got #{value.inspect}"
+    description = message.delete_suffix(shown)
+    return "cannot be decoded; the value is not shown" unless message.start_with?("expected ") && message.end_with?(shown)
+    return "cannot be decoded; the value is not shown" if [value.to_s, value.to_s.inspect[1..-2]].any? { description.include?(_1) }
+
+    "#{description}, got [REDACTED]"
   end
 
   # @private
@@ -66,5 +90,5 @@ module Decoding
     Decoders.public_send(ENV_TYPES.fetch(type))
   end
 
-  private_class_method :env_decoder
+  private_class_method :env_decoder, :redact_env_value
 end
